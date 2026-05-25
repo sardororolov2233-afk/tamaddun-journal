@@ -28,8 +28,8 @@ export default function RegisterPage() {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 56px - 200px)', padding: '4rem 2rem' }}>
-      <div style={{
+    <div className="auth-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 56px - 200px)', padding: '4rem 2rem' }}>
+      <div className="auth-card" style={{
         background: '#fff',
         width: '100%',
         maxWidth: '420px',

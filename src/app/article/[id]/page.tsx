@@ -75,7 +75,7 @@ export default function ArticleDetailPage() {
         <div style={{ width: '60px', height: '4px', background: '#1976d2', marginTop: '1rem', borderRadius: '2px' }}></div>
       </h1>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '2rem', alignItems: 'start' }}>
+      <div className="article-detail-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '2rem', alignItems: 'start' }}>
         {/* Chap qism (Ma'lumotlar) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
