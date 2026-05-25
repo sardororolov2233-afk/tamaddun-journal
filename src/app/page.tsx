@@ -146,8 +146,8 @@ export default function Home() {
         <div className="sidebar">
           <div className="volume-card">
             <div className="vol-label">{t.sidebar.currentIssue}</div>
-            <div className="vol-num">Jild 4, Son 2</div>
-            <div className="vol-date">2025 · May–Iyun</div>
+            <div className="vol-num">Jild 3, Son 4</div>
+            <div className="vol-date">2026 · May–Iyun</div>
             <hr className="vol-divider" />
             <div className="vol-stat"><span>{t.sidebar.articles}</span><strong>18</strong></div>
             <div className="vol-stat"><span>{t.sidebar.downloads}</span><strong>4,120</strong></div>

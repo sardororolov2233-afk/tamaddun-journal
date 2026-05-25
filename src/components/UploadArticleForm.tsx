@@ -56,8 +56,8 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
       has_pdf: !!pdfFile,
       author_id: user?.id,
       status: 'pending',
-      volume: 1,
-      issue: 1
+      volume: 3,
+      issue: 4
     };
 
     if (isSupabaseConfigured) {
