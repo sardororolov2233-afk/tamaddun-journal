@@ -9,7 +9,7 @@ export default function ArchivePage() {
   const [loading, setLoading] = useState(true);
 
   // Supabase ishlayotganini tekshirish
-  const isSupabaseConfigured = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL.startsWith('http');
+  const isSupabaseConfigured = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL.startsWith('http'));
 
   useEffect(() => {
     const fetchArchive = async () => {

@@ -51,30 +51,6 @@ export default function RegisterPage() {
         </div>
 
         <form onSubmit={handleEmailRegister}>
-          <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--navy)', marginBottom: '6px' }}>
-              Rolni tanlang (Demo uchun)
-            </label>
-            <select 
-              value={role}
-              onChange={e => setRole(e.target.value as Role)}
-              style={{
-                width: '100%',
-                padding: '10px 14px',
-                border: '1px solid var(--border)',
-                borderRadius: '4px',
-                fontSize: '14px',
-                fontFamily: 'inherit',
-                outline: 'none',
-                background: 'var(--cream)',
-                color: 'var(--text)'
-              }}
-            >
-              <option value="author">Muallif (Author)</option>
-              <option value="reviewer">Taqrizchi (Reviewer)</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
 
           <div style={{ marginBottom: '1.25rem' }}>
             <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--navy)', marginBottom: '6px' }}>

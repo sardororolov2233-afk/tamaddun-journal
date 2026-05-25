@@ -13,7 +13,7 @@ export default function CertificatePage() {
   const [loading, setLoading] = useState(true);
   const [articleUrl, setArticleUrl] = useState('');
 
-  const isSupabaseConfigured = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL.startsWith('http');
+  const isSupabaseConfigured = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL.startsWith('http'));
 
   useEffect(() => {
     const fetchArticle = async () => {
