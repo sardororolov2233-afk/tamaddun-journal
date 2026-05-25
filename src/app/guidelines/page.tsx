@@ -28,12 +28,13 @@ export default function GuidelinesPage() {
       ],
 
       section2Title: "2. Texnik talablar (Formatting)",
-      section2Desc: "Hujjat Microsoft Word (.doc, .docx) formatida tayyorlanishi kerak:",
+      section2Desc: "Hujjat Microsoft Word (.doc, .docx) va PDF formatlarida taqdim etilishi kerak. Har ikki faylni yuklash majburiydir:",
       formatItems: [
         "Shrift: Times New Roman yoki Arial, hajmi — 12 pt, qatorlar oralig'i (line spacing) — 1.15.",
         "Hoshiyalar (Margins): yuqoridan va pastdan — 2 sm, chapdan — 3 sm, o'ngdan — 1.5 sm.",
         "Rasmlar va jadvallar: Maqola ichida raqamlangan va aniq sarlavhaga ega bo'lishi lozim.",
-        "Maqola hajmi: 6 betdan 15 betgacha bo'lishi tavsiya etiladi."
+        "Maqola hajmi: 6 betdan 15 betgacha bo'lishi tavsiya etiladi.",
+        "PDF variant: Har bir sahifaning yuqori (header) va pastki (footer) qismida «Tamaddun» ilmiy jurnali nomi va maxsus hoshiyalari (lines) qo'yilishi shart."
       ],
 
       section3Title: "3. Nashr etish jarayoni",
@@ -73,12 +74,13 @@ export default function GuidelinesPage() {
       ],
 
       section2Title: "2. Технические требования (Formatting)",
-      section2Desc: "Документ должен быть подготовлен в формате Microsoft Word (.doc, .docx):",
+      section2Desc: "Документ должен быть представлен в форматах Microsoft Word (.doc, .docx) и PDF. Загрузка обоих файлов обязательна:",
       formatItems: [
         "Шрифт: Times New Roman или Arial, размер — 12 pt, межстрочный интервал — 1.15.",
         "Поля (Margins): сверху и снизу — 2 см, слева — 3 см, справа — 1.5 см.",
         "Рисунки и таблицы: Должны быть пронумерованы внутри статьи и иметь четкие заголовки.",
-        "Объем статьи: Рекомендуемый объем от 6 до 15 страниц."
+        "Объем статьи: Рекомендуемый объем от 6 до 15 страниц.",
+        "Вариант PDF: В верхней (header) и нижней (footer) частях каждой страницы должны быть указаны название научного журнала «Tamaddun» и его рамки."
       ],
 
       section3Title: "3. Процесс публикации",
@@ -118,12 +120,13 @@ export default function GuidelinesPage() {
       ],
 
       section2Title: "2. Technical Formatting",
-      section2Desc: "The manuscript must be submitted in Microsoft Word (.doc, .docx) format:",
+      section2Desc: "The manuscript must be submitted in both Microsoft Word (.doc, .docx) and PDF formats. Uploading both files is mandatory:",
       formatItems: [
         "Font: Times New Roman or Arial, size — 12 pt, line spacing — 1.15.",
         "Margins: top and bottom — 2 cm, left — 3 cm, right — 1.5 cm.",
         "Figures and Tables: Must be embedded inline, numbered chronologically, and have clear captions.",
-        "Paper length: Recommended length is 6 to 15 pages."
+        "Paper length: Recommended length is 6 to 15 pages.",
+        "PDF variant: The top (header) and bottom (footer) margins of each page must contain the 'Tamaddun' journal name and its borders/lines."
       ],
 
       section3Title: "3. Publication Process",

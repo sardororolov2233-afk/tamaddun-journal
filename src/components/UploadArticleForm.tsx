@@ -30,8 +30,8 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
 
   const handleInitialSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!docxFile && !pdfFile) {
-      setErrorMsg("Kamida bitta fayl (DOCX yoki PDF) yuklashingiz shart!");
+    if (!docxFile || !pdfFile) {
+      setErrorMsg("Ikkala faylni ham (DOCX va PDF) yuklashingiz shart!");
       return;
     }
     // Check if at least one author is provided
@@ -136,8 +136,9 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
         <h2 style={{ fontSize: '1.5rem', color: 'var(--navy)', marginBottom: '1.5rem', fontFamily: '"Playfair Display", serif' }}>
           Yangi maqola yuklash
         </h2>
-        <p style={{ color: 'var(--muted)', fontSize: '14px', marginBottom: '2rem' }}>
-          Iltimos, maqola ma'lumotlarini to'liq kiriting. DOCX va PDF fayllardan kamida bittasini yuklash majburiy.
+        <p style={{ color: 'var(--muted)', fontSize: '14px', marginBottom: '2rem', lineHeight: '1.6' }}>
+          Iltimos, maqola ma'lumotlarini to'liq kiriting. <strong>DOCX va PDF</strong> variantlarining ikkalasini ham yuklash majburiydir. 
+          PDF variantning yuqori (header) va pastki (footer) qismida jurnal nomi hamda hoshiyasi bo'lishi shart.
         </p>
 
         {errorMsg && (
