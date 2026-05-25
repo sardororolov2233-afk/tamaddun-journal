@@ -73,7 +73,7 @@ export default function ArchivePage() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-          {Object.entries(groupedArticles).map(([groupName, articles]) => (
+          {Object.entries(groupedArticles).map(([groupName, articles]: [string, any]) => (
             <div key={groupName} style={{ background: '#fff', border: '1px solid var(--border)', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
               <div style={{ background: 'var(--navy)', color: '#fff', padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h2 style={{ fontFamily: '"Playfair Display", serif', fontSize: '1.25rem', margin: 0, color: 'var(--gold)' }}>
