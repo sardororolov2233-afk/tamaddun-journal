@@ -28,7 +28,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="auth-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 56px - 200px)', padding: '4rem 2rem' }}>
+    <div className="auth-container animate-fade-in-up" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 56px - 200px)', padding: '4rem 2rem' }}>
       <div className="auth-card" style={{
         background: '#fff',
         width: '100%',
@@ -128,6 +128,32 @@ export default function RegisterPage() {
               onFocus={e => e.target.style.borderColor = 'var(--gold)'}
               onBlur={e => e.target.style.borderColor = 'var(--border)'}
             />
+          </div>
+
+          <div style={{ marginBottom: '1.25rem' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--navy)', marginBottom: '6px' }}>
+              Rolni tanlang / Выберите роль / Choose Role
+            </label>
+            <select 
+              value={role}
+              onChange={e => setRole(e.target.value as Role)}
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                border: '1px solid var(--border)',
+                borderRadius: '4px',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+                outline: 'none',
+                background: 'var(--cream)',
+                color: 'var(--text)',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="author">Author (Muallif)</option>
+              <option value="reviewer">Reviewer (Taqrizchi)</option>
+              <option value="admin">Admin (Tahririyat)</option>
+            </select>
           </div>
 
           <button type="submit" style={{

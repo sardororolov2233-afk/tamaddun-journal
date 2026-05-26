@@ -1,16 +1,160 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "../context/LanguageContext";
+import { supabase } from "../lib/supabaseClient";
+
+// Boshlang'ich mock maqolalar (bazada maqolalar yo'qligida ko'rsatish uchun)
+const DEFAULT_ARTICLES = [
+  {
+    id: "1",
+    title: "CRISPR-Cas9 texnologiyasi yordamida irsiy kasalliklarni davolashning yangi yondashuvlari",
+    authors: "Karimov A.B., Yusupova N.K., Chen L.",
+    affiliation: "Toshkent Tibbiyot Universiteti",
+    abstract: "Ushbu tadqiqot CRISPR-Cas9 genni tahrirlash texnologiyasidan foydalangan holda monogen kasalliklarni in vivo sharoitda bartaraf etishning yangi usullarini taqdim etadi. Olib borilgan tajribalar natijasida β-talassemiya kasalligi bilan og'rigan in vitro modellarida 87% samaradorlik ko'rsatkichi erishildi.",
+    keywords: "CRISPR-Cas9, gen tahrirlash, irsiy kasalliklar, β-talassemiya",
+    field: "Biotibbiyot",
+    status: "published",
+    volume: 4,
+    issue: 2,
+    created_at: "2025-05-12T12:00:00.000Z",
+    doi: "10.36001/tamaddun.2025.4.2.001",
+    has_docx: true,
+    has_pdf: true
+  },
+  {
+    id: "2",
+    title: "O'rta Osiyo mamlakatlari eksport diversifikatsiyasi: Raqamli iqtisodiyot sektori tahlili",
+    authors: "Toshmatov I.O., Rakhimova D.S.",
+    affiliation: "Iqtisodiyot Instituti, Samarqand",
+    abstract: "Maqolada O'zbekiston, Qozog'iston va Qirg'iziston iqtisodiyotlarida raqamli sektor eksport ulushini oshirishning makroiqtisodiy modeli taqdim etiladi. Panel ma'lumotlari asosida VECM modelidan foydalanib, 2010–2024 yillar oraliq statistikasi tahlil qilinadi.",
+    keywords: "eksport diversifikatsiyasi, raqamli iqtisodiyot, O'rta Osiyo",
+    field: "Iqtisodiyot",
+    status: "published",
+    volume: 4,
+    issue: 2,
+    created_at: "2025-05-07T12:00:00.000Z",
+    doi: "10.36001/tamaddun.2025.4.2.002",
+    has_docx: true,
+    has_pdf: true
+  },
+  {
+    id: "3",
+    title: "Kam resursli muhitlarda tabiiy tilni qayta ishlashda transformer modellarini optimallashtirish",
+    authors: "Mirzayev J.T., Abdullayeva M.F., Kim S.H.",
+    affiliation: "INHA University in Tashkent",
+    abstract: "Ushbu ish o'zbek va tojik tillarini qayta ishlashga mo'ljallangan engil transformer arxitekturasini taklif etadi. LoRA (Low-Rank Adaptation) usuli qo'llanilganda parametrlar soni 93% kamaytirildi, F1-score ko'rsatkichi esa etalon modellar bilan raqobatbardosh bo'lib qoldi.",
+    keywords: "NLP, transformer, LoRA, o'zbek tili",
+    field: "Informatika",
+    status: "published",
+    volume: 4,
+    issue: 2,
+    created_at: "2025-05-01T12:00:00.000Z",
+    doi: "10.36001/tamaddun.2025.4.2.003",
+    has_docx: true,
+    has_pdf: true
+  },
+  {
+    id: "4",
+    title: "Qorakumdan olingan zeolitlar asosida yangi sorbentlar sintezi va ularning ekologik xususiyatlari",
+    authors: "Xoliqov B.A., Saidova G.R.",
+    affiliation: "Kimyo Fanlari Instituti, Toshkent",
+    abstract: "Tabiiy zeolitlar asosida ishlab chiqilgan kompozit sorbentlarning og'ir metallarni (Pb, Cd, Cr) suvli eritmasilardan ushlab qolish samaradorligi o'rganildi. Sintez qilingan namunalar BET tahlili va SEM-EDX usullari bilan xarakterlandi.",
+    keywords: "zeolit, sorbent, og'ir metallar",
+    field: "Kimyo",
+    status: "published",
+    volume: 4,
+    issue: 2,
+    created_at: "2025-04-28T12:00:00.000Z",
+    doi: "10.36001/tamaddun.2025.4.2.004",
+    has_docx: true,
+    has_pdf: true
+  }
+];
 
 export default function Home() {
   const router = useRouter();
   const { t } = useLanguage();
 
+  // Search input states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchField, setSearchField] = useState("All");
+  const [searchYear, setSearchYear] = useState("All");
+
+  // Articles state
+  const [articles, setArticles] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<"latest" | "downloaded" | "review">("latest");
+  const [loading, setLoading] = useState(true);
+
+  const isSupabaseConfigured = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL.startsWith('http'));
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      let dbArticles: any[] = [];
+
+      if (isSupabaseConfigured) {
+        const { data, error } = await supabase
+          .from('articles')
+          .select('*')
+          .eq('status', 'published')
+          .order('created_at', { ascending: false });
+
+        if (data && !error) {
+          dbArticles = data;
+        }
+      } else {
+        const saved = localStorage.getItem('gjir_articles');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          dbArticles = parsed.filter((a: any) => a.status === 'published');
+        }
+      }
+
+      // Merge database/localStorage articles with fallback articles
+      const combined = [...dbArticles];
+      DEFAULT_ARTICLES.forEach(mockArt => {
+        if (!combined.some(c => c.id === mockArt.id || c.title.toLowerCase() === mockArt.title.toLowerCase())) {
+          combined.push(mockArt);
+        }
+      });
+
+      setArticles(combined);
+      setLoading(false);
+    };
+
+    fetchArticles();
+  }, [isSupabaseConfigured]);
+
   const handleSearch = () => {
-    router.push("/search");
+    const params = new URLSearchParams();
+    if (searchQuery.trim()) params.set("q", searchQuery);
+    if (searchField !== "All" && searchField !== t.search.allFields) params.set("field", searchField);
+    if (searchYear !== "All") params.set("year", searchYear);
+    
+    router.push(`/search?${params.toString()}`);
+  };
+
+  const getPdfUrl = (art: any) => {
+    if (isSupabaseConfigured && art.id.length > 5) {
+      const { data } = supabase.storage.from('articles_files').getPublicUrl(`${art.id}.pdf`);
+      return data.publicUrl;
+    }
+    return '#';
+  };
+
+  // Filter articles based on active tab
+  const getDisplayArticles = () => {
+    if (activeTab === "latest") {
+      return articles.slice(0, 5);
+    } else if (activeTab === "downloaded") {
+      // Mock downloads: sort by id length or default order
+      return [...articles].sort((a, b) => (b.title.length - a.title.length)).slice(0, 3);
+    } else {
+      // Return a subset representing review process
+      return articles.slice(2, 4);
+    }
   };
 
   return (
@@ -28,7 +172,7 @@ export default function Home() {
           </div>
         </div>
         <div className="hero-stats">
-          <div className="stat-card"><div className="stat-num">1,240</div><div className="stat-label">{t.stats.published}</div></div>
+          <div className="stat-card"><div className="stat-num">{1240 + articles.filter(a => a.id.length > 5).length}</div><div className="stat-label">{t.stats.published}</div></div>
           <div className="stat-card"><div className="stat-num">48</div><div className="stat-label">{t.stats.editors}</div></div>
           <div className="stat-card"><div className="stat-num">92</div><div className="stat-label">{t.stats.countries}</div></div>
         </div>
@@ -37,119 +181,129 @@ export default function Home() {
       <div className="search-bar">
         <div className="search-wrap">
           <i className="ti ti-search" aria-hidden="true"></i>
-          <input type="text" placeholder={t.search.placeholder} />
+          <input 
+            type="text" 
+            placeholder={t.search.placeholder} 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+          />
         </div>
-        <select className="filter-select">
-          <option>{t.search.allFields}</option>
-          <option>{t.search.physics}</option>
-          <option>{t.search.biology}</option>
-          <option>{t.search.economics}</option>
-          <option>{t.search.medicine}</option>
-          <option>{t.search.cs}</option>
+        <select 
+          className="filter-select"
+          value={searchField}
+          onChange={(e) => setSearchField(e.target.value)}
+        >
+          <option value="All">{t.search.allFields}</option>
+          <option value="Biotibbiyot">{t.search.biology}</option>
+          <option value="Iqtisodiyot">{t.search.economics}</option>
+          <option value="Informatika">{t.search.cs}</option>
+          <option value="Kimyo">Kimyo</option>
         </select>
-        <select className="filter-select">
-          <option>2024–2025</option>
-          <option>2023</option>
-          <option>2022</option>
+        <select 
+          className="filter-select"
+          value={searchYear}
+          onChange={(e) => setSearchYear(e.target.value)}
+        >
+          <option value="All">Barcha yillar</option>
+          <option value="2025">2025</option>
+          <option value="2026">2026</option>
+          <option value="2024–2025">2024–2025</option>
+          <option value="2023">2023</option>
         </select>
         <button className="btn-search" onClick={handleSearch}>{t.search.btn}</button>
       </div>
 
-      <div className="main">
+      <div className="main animate-fade-in-up">
         <div className="articles-col">
           <div className="tabs">
-            <div className="tab active">{t.tabs.latest}</div>
-            <div className="tab">{t.tabs.downloaded}</div>
-            <div className="tab">{t.tabs.review}</div>
+            <div 
+              className={`tab ${activeTab === 'latest' ? 'active' : ''}`}
+              onClick={() => setActiveTab('latest')}
+            >
+              {t.tabs.latest}
+            </div>
+            <div 
+              className={`tab ${activeTab === 'downloaded' ? 'active' : ''}`}
+              onClick={() => setActiveTab('downloaded')}
+            >
+              {t.tabs.downloaded}
+            </div>
+            <div 
+              className={`tab ${activeTab === 'review' ? 'active' : ''}`}
+              onClick={() => setActiveTab('review')}
+            >
+              {t.tabs.review}
+            </div>
           </div>
 
           <div className="section-head">
-            <h2>2025 · Jild 4, Son 2</h2>
-            <Link href="/archive/2025-v4-i2" style={{ textDecoration: 'none' }}>{t.tabs.viewAll}</Link>
+            <h2>
+              {activeTab === 'latest' && "2025 · Jild 4, Son 2"}
+              {activeTab === 'downloaded' && "Ko'p o'qilgan ilmiy maqolalar"}
+              {activeTab === 'review' && "Taqriz va muhokama bosqichidagi tadqiqotlar"}
+            </h2>
+            <Link href="/archive" style={{ textDecoration: 'none' }}>{t.tabs.viewAll}</Link>
           </div>
 
-          <div className="article-card">
-            <div className="article-meta">
-              <span className="tag tag-field">Biotibbiyot</span>
-              <span className="tag tag-open">Open Access</span>
-              <span className="article-date">12 May 2025</span>
+          {loading ? (
+            <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--muted)' }}>
+              Yuklanmoqda...
             </div>
-            <h3><Link href="/article/1" style={{ color: 'inherit', textDecoration: 'none' }}>CRISPR-Cas9 texnologiyasi yordamida irsiy kasalliklarni davolashning yangi yondashuvlari</Link></h3>
-            <div className="authors">Karimov A.B., Yusupova N.K., Chen L. · Toshkent Tibbiyot Universiteti</div>
-            <div className="abstract clamped">Ushbu tadqiqot CRISPR-Cas9 genni tahrirlash texnologiyasidan foydalangan holda monogen kasalliklarni in vivo sharoitda bartaraf etishning yangi usullarini taqdim etadi. Olib borilgan tajribalar natijasida β-talassemiya kasalligi bilan og&apos;rigan in vitro modellarida 87% samaradorlik ko&apos;rsatkichi erishildi.</div>
-            <div className="article-actions">
-              <button className="btn-pdf"><i className="ti ti-file-type-pdf" aria-hidden="true"></i>PDF yuklash</button>
-              <button className="btn-cite"><i className="ti ti-quote" aria-hidden="true"></i>Iqtibos</button>
-              <span className="doi">DOI: 10.36001/tamaddun.2025.4.2.001</span>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {getDisplayArticles().map((article) => (
+                <div key={article.id} className="article-card">
+                  <div className="article-meta">
+                    <span className="tag tag-field">{article.field || "Biotibbiyot"}</span>
+                    <span className="tag tag-open">Open Access</span>
+                    {new Date(article.created_at || article.date || Date.now()).getFullYear() === 2025 && (
+                      <span className="tag tag-new">Yangi</span>
+                    )}
+                    <span className="article-date">
+                      {new Date(article.created_at || article.date || Date.now()).toLocaleDateString("uz-UZ", {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                      })}
+                    </span>
+                  </div>
+                  <h3>
+                    <Link href={`/article/${article.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                      {article.title}
+                    </Link>
+                  </h3>
+                  <div className="authors">
+                    {Array.isArray(article.authors) ? article.authors.join(", ") : article.authors} 
+                    {article.affiliation && ` · ${article.affiliation}`}
+                  </div>
+                  <div className="abstract clamped">
+                    {article.abstract}
+                  </div>
+                  <div className="article-actions">
+                    <a href={getPdfUrl(article)} target="_blank" rel="noopener noreferrer" className="btn-pdf" style={{ textDecoration: 'none' }}>
+                      <i className="ti ti-file-type-pdf" aria-hidden="true" style={{ color: '#e53935' }}></i> PDF yuklash
+                    </a>
+                    <Link href={`/article/${article.id}/certificate`} target="_blank" className="btn-cite" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <i className="ti ti-certificate" aria-hidden="true" style={{ color: 'var(--gold)' }}></i> Sertifikat
+                    </Link>
+                    <span className="doi">
+                      {article.doi || `DOI: 10.36001/tamaddun.2025.${article.volume}.${article.issue}.${article.id.slice(0, 5)}`}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-
-          <div className="article-card">
-            <div className="article-meta">
-              <span className="tag tag-field">Iqtisodiyot</span>
-              <span className="tag tag-open">Open Access</span>
-              <span className="tag tag-new">Yangi</span>
-              <span className="article-date">7 May 2025</span>
-            </div>
-            <h3><Link href="/article/2" style={{ color: 'inherit', textDecoration: 'none' }}>O&apos;rta Osiyo mamlakatlari eksport diversifikatsiyasi: Raqamli iqtisodiyot sektori tahlili</Link></h3>
-            <div className="authors">Toshmatov I.O., Rakhimova D.S. · Iqtisodiyot Instituti, Samarqand</div>
-            <div className="abstract clamped">Maqolada O&apos;zbekiston, Qozog&apos;iston va Qirg&apos;iziston iqtisodiyotlarida raqamli sektor eksport ulushini oshirishning makroiqtisodiy modeli taqdim etiladi. Panel ma&apos;lumotlari asosida VECM modelidan foydalanib, 2010–2024 yillar oraliq statistikasi tahlil qilinadi.</div>
-            <div className="article-actions">
-              <button className="btn-pdf"><i className="ti ti-file-type-pdf" aria-hidden="true"></i>PDF yuklash</button>
-              <button className="btn-cite"><i className="ti ti-quote" aria-hidden="true"></i>Iqtibos</button>
-              <span className="doi">DOI: 10.36001/tamaddun.2025.4.2.002</span>
-            </div>
-          </div>
-
-          <div className="article-card">
-            <div className="article-meta">
-              <span className="tag tag-field">Informatika</span>
-              <span className="tag tag-open">Open Access</span>
-              <span className="article-date">1 May 2025</span>
-            </div>
-            <h3><Link href="/article/3" style={{ color: 'inherit', textDecoration: 'none' }}>Kam resursli muhitlarda tabiiy tilni qayta ishlashda transformer modellarini optimallashtirish</Link></h3>
-            <div className="authors">Mirzayev J.T., Abdullayeva M.F., Kim S.H. · INHA University in Tashkent</div>
-            <div className="abstract clamped">Ushbu ish o&apos;zbek va tojik tillarini qayta ishlashga mo&apos;ljallangan engil transformer arxitekturasini taklif etadi. LoRA (Low-Rank Adaptation) usuli qo&apos;llanilganda parametrlar soni 93% kamaytirildi, F1-score ko&apos;rsatkichi esa etalon modellar bilan raqobatbardosh bo&apos;lib qoldi.</div>
-            <div className="article-actions">
-              <button className="btn-pdf"><i className="ti ti-file-type-pdf" aria-hidden="true"></i>PDF yuklash</button>
-              <button className="btn-cite"><i className="ti ti-quote" aria-hidden="true"></i>Iqtibos</button>
-              <span className="doi">DOI: 10.36001/tamaddun.2025.4.2.003</span>
-            </div>
-          </div>
-
-          <div className="article-card">
-            <div className="article-meta">
-              <span className="tag tag-field">Kimyo</span>
-              <span className="tag tag-review">Taqriz ostida</span>
-              <span className="article-date">28 Apr 2025</span>
-            </div>
-            <h3><Link href="/article/4" style={{ color: 'inherit', textDecoration: 'none' }}>Qorakumdan olingan zeolitlar asosida yangi sorbentlar sintezi va ularning ekologik xususiyatlari</Link></h3>
-            <div className="authors">Xoliqov B.A., Saidova G.R. · Kimyo Fanlari Instituti, Toshkent</div>
-            <div className="abstract clamped">Tabiiy zeolitlar asosida ishlab chiqilgan kompozit sorbentlarning og&apos;ir metallarni (Pb, Cd, Cr) suvli eritmasilardan ushlab qolish samaradorligi o&apos;rganildi. Sintez qilingan namunalar BET tahlili va SEM-EDX usullari bilan xarakterlandi.</div>
-            <div className="article-actions">
-              <button className="btn-pdf"><i className="ti ti-file-type-pdf" aria-hidden="true"></i>PDF yuklash</button>
-              <button className="btn-cite"><i className="ti ti-quote" aria-hidden="true"></i>Iqtibos</button>
-              <span className="doi">DOI: 10.36001/tamaddun.2025.4.2.004</span>
-            </div>
-          </div>
-
-          <div className="pagination">
-            <button className="page-btn active">1</button>
-            <button className="page-btn">2</button>
-            <button className="page-btn">3</button>
-            <button className="page-btn">4</button>
-            <button className="page-btn">5</button>
-            <button className="page-btn"><i className="ti ti-chevron-right" aria-hidden="true"></i></button>
-          </div>
+          )}
         </div>
 
         <div className="sidebar">
           <div className="volume-card">
             <div className="vol-label">{t.sidebar.currentIssue}</div>
-            <div className="vol-num">Jild 3, Son 4</div>
-            <div className="vol-date">2026 · May–Iyun</div>
+            <div className="vol-num">Jild 4, Son 2</div>
+            <div className="vol-date">2025 · May–Iyun</div>
             <hr className="vol-divider" />
-            <div className="vol-stat"><span>{t.sidebar.articles}</span><strong>18</strong></div>
+            <div className="vol-stat"><span>{t.sidebar.articles}</span><strong>{articles.length}</strong></div>
             <div className="vol-stat"><span>{t.sidebar.downloads}</span><strong>4,120</strong></div>
             <div className="vol-stat"><span>{t.sidebar.citations}</span><strong>312</strong></div>
           </div>

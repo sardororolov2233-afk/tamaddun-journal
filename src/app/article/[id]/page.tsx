@@ -81,7 +81,7 @@ export default function ArticleDetailPage() {
           
           {/* Mualliflar */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {article.authors.map((authorName: string, idx: number) => (
+            {(Array.isArray(article.authors) ? article.authors : (typeof article.authors === 'string' ? (article.authors as string).split(', ') : [])).map((authorName: string, idx: number) => (
               <div key={idx} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1.25rem' }}>
                 <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: '1.1rem', marginBottom: '4px' }}>
                   {authorName}

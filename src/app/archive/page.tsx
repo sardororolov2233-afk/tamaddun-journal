@@ -55,7 +55,7 @@ export default function ArchivePage() {
   };
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto', padding: '3rem 1rem', minHeight: 'calc(100vh - 200px)' }}>
+    <div className="animate-fade-in-up" style={{ maxWidth: '900px', margin: '0 auto', padding: '3rem 1rem', minHeight: 'calc(100vh - 200px)' }}>
       <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: '2.5rem', color: 'var(--navy)', marginBottom: '1rem', textAlign: 'center' }}>
         Jurnal Arrivi
       </h1>
