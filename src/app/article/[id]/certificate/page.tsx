@@ -43,7 +43,7 @@ export default function CertificatePage() {
 
   useEffect(() => {
     if (article) {
-      setArticleUrl(`https://www.journal-tamaddun.uz/article/${article.id}`);
+      setArticleUrl(`https://jurnal-tamaddun.uz/article/${article.id}`);
     }
   }, [article]);
 
@@ -75,7 +75,7 @@ export default function CertificatePage() {
     day: 'numeric'
   });
 
-  const displayUrl = articleUrl ? articleUrl.replace(/^https?:\/\//, '') : `www.journal-tamaddun.uz/article/${article.id}`;
+  const displayUrl = articleUrl ? articleUrl.replace(/^https?:\/\//, '') : `jurnal-tamaddun.uz/article/${article.id}`;
   const doiCode = `10.36001/tamaddun.${pubYear}.${article.volume}.${article.issue}.${article.id.slice(0, 8)}`;
 
   return (
@@ -506,7 +506,7 @@ export default function CertificatePage() {
               <div className="cert-logo">T</div>
               <div className="cert-journal-name">Tamaddun</div>
               <div className="cert-journal-subtitle">Ilmiy tadbirkorlik va innovatsiyalar jurnali</div>
-              <div className="cert-issn">ISSN (online): 2949-XXXX · www.journal-tamaddun.uz</div>
+              <div className="cert-issn">ISSN (online): 2949-XXXX · jurnal-tamaddun.uz</div>
             </div>
 
             {/* Certificate Title */}
