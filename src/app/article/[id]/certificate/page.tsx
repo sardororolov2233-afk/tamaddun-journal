@@ -19,7 +19,8 @@ export default function CertificatePage() {
     const checkBg = async () => {
       try {
         const res = await fetch('/sertifikat_bg.jpg', { method: 'HEAD' });
-        if (res.ok) {
+        const contentType = res.headers.get('content-type');
+        if (res.ok && contentType && contentType.includes('image')) {
           setHasCustomBg(true);
           setUseCustomBg(true);
         }
@@ -83,12 +84,9 @@ export default function CertificatePage() {
     );
   }
 
-  const pubYear = new Date(article.created_at || article.date || Date.now()).getFullYear();
-  const pubDateFormatted = new Date(article.created_at || article.date || Date.now()).toLocaleDateString('uz-UZ', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+  const dateObj = new Date(article.created_at || article.date || Date.now());
+  const pubYear = dateObj.getFullYear();
+  const pubDateFormatted = `${String(dateObj.getDate()).padStart(2, '0')}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${pubYear}`;
 
   const displayUrl = articleUrl ? articleUrl.replace(/^https?:\/\//, '') : `jurnal-tamaddun.uz/article/${article.id}`;
   const doiCode = `10.36001/tamaddun.${pubYear}.${article.volume}.${article.issue}.${article.id.slice(0, 8)}`;
