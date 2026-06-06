@@ -76,7 +76,7 @@ const DEFAULT_ARTICLES = [
 
 export default function Home() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   // Search input states
   const [searchQuery, setSearchQuery] = useState("");
@@ -311,6 +311,7 @@ export default function Home() {
           <div className="sidebar-section">
             <h3>{t.sidebar.quickLinks}</h3>
             <Link href="/login" className="quick-link" style={{ textDecoration: 'none' }}><i className="ti ti-upload" aria-hidden="true"></i>{t.nav.submit}</Link>
+            <Link href="/login" className="quick-link" style={{ textDecoration: 'none' }}><i className="ti ti-notes" aria-hidden="true"></i>{lang === 'UZ' ? 'Tezis yuborish' : lang === 'RU' ? 'Отправить тезис' : 'Submit Thesis'}</Link>
             <Link href="/track" className="quick-link" style={{ textDecoration: 'none' }}><i className="ti ti-clock" aria-hidden="true"></i>{t.sidebar.track}</Link>
             <Link href="/apc" className="quick-link" style={{ textDecoration: 'none' }}><i className="ti ti-currency-dollar" aria-hidden="true"></i>{t.sidebar.apc}</Link>
             <Link href="/guidelines" className="quick-link" style={{ textDecoration: 'none' }}><i className="ti ti-book" aria-hidden="true"></i>{t.sidebar.authorGuide}</Link>

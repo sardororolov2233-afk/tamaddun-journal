@@ -119,12 +119,17 @@ export default function ArticleDetailPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           {/* Muqova / Banner (Mockup) */}
-          <div style={{ background: 'var(--navy)', borderRadius: '8px', padding: '2rem', textAlign: 'center', color: '#fff', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
-            <div style={{ fontFamily: '"Playfair Display", serif', fontSize: '1.5rem', fontWeight: 700, marginBottom: '10px' }}>Tamaddun</div>
-            <div style={{ fontSize: '12px', color: 'var(--gold-light)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '20px' }}>Tamaddun</div>
-            <div style={{ width: '100px', height: '140px', background: 'rgba(255,255,255,0.1)', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.2)' }}>
-              <i className="ti ti-file-text" style={{ fontSize: '3rem', color: 'rgba(255,255,255,0.5)' }}></i>
-            </div>
+          <div style={{ background: 'var(--navy)', borderRadius: '8px', padding: '1.5rem', textAlign: 'center', color: '#fff', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+            <div style={{ fontFamily: '"Playfair Display", serif', fontSize: '1.4rem', fontWeight: 700 }}>Tamaddun</div>
+            <img 
+              src="/jild_cover.png" 
+              alt="Jurnal Muqovasi" 
+              style={{ width: '150px', height: '210px', objectFit: 'cover', borderRadius: '4px', boxShadow: '0 4px 12px rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)' }} 
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+            <div style={{ fontSize: '11px', color: 'var(--gold-light)', textTransform: 'uppercase', letterSpacing: '1px' }}>Jild {article.volume} · Nashr {article.issue}</div>
           </div>
 
           {/* Fayllar */}
