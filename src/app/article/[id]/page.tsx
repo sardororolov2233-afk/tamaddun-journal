@@ -60,6 +60,14 @@ export default function ArticleDetailPage() {
     return '#';
   };
 
+  const getUploadedCertificateUrl = () => {
+    if (isSupabaseConfigured) {
+      const { data } = supabase.storage.from('articles_files').getPublicUrl(`certificates/${article.id}.pdf`);
+      return data.publicUrl;
+    }
+    return '#';
+  };
+
   return (
     <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem 1rem', minHeight: 'calc(100vh - 200px)' }}>
       {/* Breadcrumbs */}
@@ -148,10 +156,22 @@ export default function ArticleDetailPage() {
             <Link 
               href={`/article/${article.id}/certificate`} 
               target="_blank"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#e3f2fd', color: '#1976d2', textDecoration: 'none', padding: '10px', borderRadius: '30px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', width: '100%' }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#e3f2fd', color: '#1976d2', textDecoration: 'none', padding: '10px', borderRadius: '30px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', width: '100%', marginBottom: article.has_certificate ? '10px' : '0' }}
             >
-              <i className="ti ti-certificate"></i> Sertifikatni ko'rish
+              <i className="ti ti-certificate"></i> Sertifikatni ko'rish (Auto)
             </Link>
+
+            {article.has_certificate && (
+              <a 
+                href={getUploadedCertificateUrl()} 
+                target="_blank"
+                rel="noopener noreferrer"
+                download={`Sertifikat_${article.title}.pdf`}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'var(--navy)', color: 'var(--gold-light)', textDecoration: 'none', padding: '10px', borderRadius: '30px', fontSize: '13px', fontWeight: 600, transition: 'background 0.2s', width: '100%' }}
+              >
+                <i className="ti ti-download"></i> Rasmiy Sertifikat (Yuklash)
+              </a>
+            )}
           </div>
         </div>
       </div>
