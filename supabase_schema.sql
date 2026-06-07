@@ -25,6 +25,7 @@ create table public.articles (
   reviewer_notes text,
   has_docx boolean default false,
   has_pdf boolean default false,
+  has_certificate boolean default false,
   status text check (status in ('pending', 'published', 'rejected')) default 'pending',
   volume integer default 1, -- Birinchi jild (Volume 1)
   issue integer default 1,  -- Birinchi nashr (Issue 1)
@@ -52,6 +53,7 @@ create table public.volumes (
   comment text,
   field text not null,
   pdf_url text,
+  cover_image_url text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 

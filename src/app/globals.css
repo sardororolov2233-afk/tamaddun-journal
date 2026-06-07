@@ -946,6 +946,29 @@ footer {
     flex-direction: column !important;
     gap: 1.25rem !important;
   }
+  
+  /* Generic inline grid overrides for mobile */
+  div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  
+  div[style*="grid-template-columns: 280px 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  .dashboard-layout {
+    grid-template-columns: 1fr !important;
+    padding: 1.5rem 1rem !important;
+  }
+  
+  .dashboard-sidebar > div {
+    position: static !important;
+    margin-bottom: 2rem !important;
+  }
+  
+  .archive-volumes-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 @media (max-width: 480px) {

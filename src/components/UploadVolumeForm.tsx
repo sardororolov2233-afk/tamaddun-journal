@@ -12,6 +12,7 @@ export default function UploadVolumeForm({ onSuccess }: { onSuccess?: () => void
   const [customField, setCustomField] = useState('');
   const [comment, setComment] = useState('');
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [coverImage, setCoverImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -54,6 +55,22 @@ export default function UploadVolumeForm({ onSuccess }: { onSuccess?: () => void
 
         const pdfUrl = publicUrlData?.publicUrl || '';
 
+        // Upload Cover Image if exists
+        let coverImageUrl = '';
+        if (coverImage) {
+          const imagePath = `volumes/covers/${volumeId}_cover.${coverImage.name.split('.').pop()}`;
+          const { error: imgError } = await supabase.storage
+            .from('articles_files')
+            .upload(imagePath, coverImage, { upsert: true });
+            
+          if (!imgError) {
+            const { data: imgUrlData } = supabase.storage
+              .from('articles_files')
+              .getPublicUrl(imagePath);
+            coverImageUrl = imgUrlData?.publicUrl || '';
+          }
+        }
+
         // 2. Insert Volume info in Database
         const { error: dbError } = await supabase
           .from('volumes')
@@ -63,7 +80,8 @@ export default function UploadVolumeForm({ onSuccess }: { onSuccess?: () => void
               title,
               comment,
               field: selectedField,
-              pdf_url: pdfUrl
+              pdf_url: pdfUrl,
+              cover_image_url: coverImageUrl
             }
           ]);
 
@@ -90,6 +108,7 @@ export default function UploadVolumeForm({ onSuccess }: { onSuccess?: () => void
       setTitle('');
       setComment('');
       setPdfFile(null);
+      setCoverImage(null);
       if (onSuccess) onSuccess();
     } catch (err: any) {
       setErrorMsg(err.message || "Xatolik yuz berdi");
@@ -187,18 +206,33 @@ export default function UploadVolumeForm({ onSuccess }: { onSuccess?: () => void
           />
         </div>
 
-        <div style={{ border: `2px dashed ${pdfFile ? '#4CAF50' : 'var(--border)'}`, padding: '2rem', textAlign: 'center', borderRadius: '6px', background: 'var(--cream)', marginBottom: '1.5rem' }}>
-          <i className="ti ti-file-type-pdf" style={{ fontSize: '2.5rem', color: pdfFile ? '#4CAF50' : '#e53935', marginBottom: '10px' }}></i>
-          <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)', marginBottom: '5px' }}>
-            {lang === 'UZ' ? `PDF shaklidagi to'liq kitob ${pdfFile ? '✅' : '*'}` : `Полная книга в формате PDF ${pdfFile ? '✅' : '*'}`}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+          <div style={{ border: `2px dashed ${pdfFile ? '#4CAF50' : 'var(--border)'}`, padding: '2rem', textAlign: 'center', borderRadius: '6px', background: 'var(--cream)' }}>
+            <i className="ti ti-file-type-pdf" style={{ fontSize: '2.5rem', color: pdfFile ? '#4CAF50' : '#e53935', marginBottom: '10px' }}></i>
+            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)', marginBottom: '5px' }}>
+              {lang === 'UZ' ? `PDF shaklidagi to'liq kitob ${pdfFile ? '✅' : '*'}` : `Полная книга в формате PDF ${pdfFile ? '✅' : '*'}`}
+            </div>
+            <input 
+              type="file" 
+              accept=".pdf" 
+              required
+              onChange={(e) => setPdfFile(e.target.files ? e.target.files[0] : null)} 
+              style={{ fontSize: '13px', width: '100%' }} 
+            />
           </div>
-          <input 
-            type="file" 
-            accept=".pdf" 
-            required
-            onChange={(e) => setPdfFile(e.target.files ? e.target.files[0] : null)} 
-            style={{ fontSize: '13px' }} 
-          />
+
+          <div style={{ border: `2px dashed ${coverImage ? '#4CAF50' : 'var(--border)'}`, padding: '2rem', textAlign: 'center', borderRadius: '6px', background: 'var(--cream)' }}>
+            <i className="ti ti-photo" style={{ fontSize: '2.5rem', color: coverImage ? '#4CAF50' : '#2196F3', marginBottom: '10px' }}></i>
+            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)', marginBottom: '5px' }}>
+              {lang === 'UZ' ? `Jild muqovasi (Rasm) ${coverImage ? '✅' : ''}` : `Обложка тома (Фото) ${coverImage ? '✅' : ''}`}
+            </div>
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={(e) => setCoverImage(e.target.files ? e.target.files[0] : null)} 
+              style={{ fontSize: '13px', width: '100%' }} 
+            />
+          </div>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>

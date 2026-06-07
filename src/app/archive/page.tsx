@@ -191,12 +191,12 @@ export default function ArchivePage() {
             <p style={{ color: 'var(--muted)' }}>Yuklangan to'liq jild (nashr) PDF kitoblari shu yerda ko'rinadi.</p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div className="archive-volumes-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
             {volumes.map(vol => (
               <div key={vol.id} style={{ background: '#fff', border: '1px solid var(--border)', borderRadius: '8px', padding: '1.5rem', boxShadow: 'var(--shadow-sm)', display: 'flex', gap: '1.5rem' }}>
                 <div style={{ flexShrink: 0, width: '70px', height: '95px', borderRadius: '4px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', border: '1px solid var(--border)' }}>
                   <img 
-                    src="/jild_cover.png" 
+                    src={vol.cover_image_url || "/jild_cover.png"} 
                     alt="Jild Muqovasi" 
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                     onError={(e) => {

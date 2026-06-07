@@ -23,6 +23,7 @@ export default function DashboardPage() {
   const [profileName, setProfileName] = useState('');
   const [reviewNoteText, setReviewNoteText] = useState<{ [key: string]: string }>({});
   const [updatingProfile, setUpdatingProfile] = useState(false);
+  const [uploadingCert, setUploadingCert] = useState<{ [key: string]: boolean }>({});
 
   // Fetch articles from Supabase or LocalStorage
   const fetchArticles = async () => {
@@ -362,6 +363,46 @@ export default function DashboardPage() {
     }
   };
 
+  // Upload Certificate
+  const handleUploadCertificate = async (articleId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!isSupabaseConfigured) {
+      alert(lang === 'UZ' ? "Supabase ulanmagan. Ma'lumotlarni saqlab bo'lmaydi." : "Supabase не подключен. Невозможно сохранить данные.");
+      return;
+    }
+
+    setUploadingCert({ ...uploadingCert, [articleId]: true });
+    
+    try {
+      const { supabase } = await import('../../lib/supabaseClient');
+      const fileName = `certificates/${articleId}.pdf`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('articles_files')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { error: updateError } = await supabase.from('articles')
+        .update({ has_certificate: true })
+        .eq('id', articleId);
+
+      if (updateError) throw updateError;
+
+      alert(lang === 'UZ' ? "Sertifikat muvaffaqiyatli yuklandi!" : "Сертификат успешно загружен!");
+      fetchArticles();
+    } catch (error: any) {
+      alert("Xatolik yuz berdi: " + error.message);
+    } finally {
+      setUploadingCert({ ...uploadingCert, [articleId]: false });
+    }
+  };
+
   if (!mounted || !user) return null;
 
   // Filtered listings
@@ -399,11 +440,19 @@ export default function DashboardPage() {
     return '#';
   };
 
+  const getCertificateUrl = (art: any) => {
+    if (isSupabaseConfigured && art.id.length > 5) {
+      const { data } = supabase.storage.from('articles_files').getPublicUrl(`certificates/${art.id}.pdf`);
+      return data.publicUrl;
+    }
+    return '#';
+  };
+
   return (
-    <div className="animate-fade-in-up" style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1rem', display: 'grid', gridTemplateColumns: '280px 1fr', gap: '2.5rem', minHeight: 'calc(100vh - 200px)' }}>
+    <div className="dashboard-layout animate-fade-in-up" style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1rem', display: 'grid', gridTemplateColumns: '280px 1fr', gap: '2.5rem', minHeight: 'calc(100vh - 200px)' }}>
       
       {/* Dashboard Sidebar */}
-      <div>
+      <div className="dashboard-sidebar">
         <div style={{
           background: '#fff',
           padding: '2rem 1.5rem',
@@ -625,9 +674,15 @@ export default function DashboardPage() {
                           <Link href={`/article/${article.id}`} style={{ fontSize: '12.5px', color: 'var(--navy)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
                             <i className="ti ti-external-link"></i> Maqola sahifasi
                           </Link>
-                          <Link href={`/article/${article.id}/certificate`} target="_blank" style={{ fontSize: '12.5px', color: '#b8902a', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
-                            <i className="ti ti-certificate"></i> Sertifikat (PDF)
-                          </Link>
+                          {article.has_certificate ? (
+                            <a href={getCertificateUrl(article)} target="_blank" rel="noopener noreferrer" download={`Sertifikat_${article.title}.pdf`} style={{ fontSize: '12.5px', color: '#b8902a', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
+                              <i className="ti ti-certificate"></i> Sertifikatni yuklab olish
+                            </a>
+                          ) : (
+                            <span style={{ fontSize: '12px', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <i className="ti ti-clock"></i> Sertifikat kutilmoqda
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
@@ -853,7 +908,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
                       <div style={{ fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Fayllar:</div>
                       {article.has_docx && (
                         <a href={isSupabaseConfigured ? `https://${process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]}/storage/v1/object/public/articles_files/${article.id}.docx` : '#'} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', background: '#e3f2fd', color: '#1976d2', padding: '4px 12px', borderRadius: '4px', fontSize: '12px', fontWeight: 600 }}>
@@ -865,6 +920,25 @@ export default function DashboardPage() {
                           <i className="ti ti-download"></i> PDF
                         </a>
                       )}
+                      
+                      {/* Sertifikat yuklash qismi */}
+                      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {article.has_certificate && (
+                          <a href={getCertificateUrl(article)} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: '#b8902a', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <i className="ti ti-certificate"></i> Yuklangan
+                          </a>
+                        )}
+                        <label style={{ cursor: uploadingCert[article.id] ? 'not-allowed' : 'pointer', background: 'var(--navy)', color: 'var(--gold-light)', padding: '6px 14px', borderRadius: '4px', fontSize: '12px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', opacity: uploadingCert[article.id] ? 0.7 : 1 }}>
+                          <i className="ti ti-upload"></i> {uploadingCert[article.id] ? 'Yuklanmoqda...' : (article.has_certificate ? 'Sertifikatni yangilash' : 'Sertifikat yuklash')}
+                          <input 
+                            type="file" 
+                            accept=".pdf" 
+                            style={{ display: 'none' }}
+                            disabled={uploadingCert[article.id]}
+                            onChange={(e) => handleUploadCertificate(article.id, e)}
+                          />
+                        </label>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -1097,8 +1171,16 @@ export default function DashboardPage() {
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {volumes.map(vol => (
-                      <div key={vol.id} style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '1rem', background: 'var(--cream)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div style={{ marginRight: '10px' }}>
+                      <div key={vol.id} style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '1rem', background: 'var(--cream)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+                        <div style={{ flexShrink: 0, width: '40px', height: '55px', borderRadius: '4px', overflow: 'hidden', background: 'var(--navy)' }}>
+                          <img 
+                            src={vol.cover_image_url || "/jild_cover.png"} 
+                            alt="Jild Muqovasi" 
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                          />
+                        </div>
+                        <div style={{ flex: 1, marginRight: '10px' }}>
                           <h4 style={{ fontSize: '14px', color: 'var(--navy)', fontWeight: 700, margin: '0 0 4px 0' }}>{vol.title}</h4>
                           <span style={{ fontSize: '11px', background: 'var(--navy)', color: 'var(--gold-light)', padding: '2px 8px', borderRadius: '4px', display: 'inline-block', marginBottom: '8px', fontWeight: 600 }}>
                             {vol.field}
