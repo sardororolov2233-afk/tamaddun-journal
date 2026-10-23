@@ -2,9 +2,14 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import Link from 'next/link';
+import { JOURNAL } from '../lib/journal';
+import { migrateLocalArchive } from '../lib/journalRepository';
 
 export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => void }) {
   const { user, isSupabaseConfigured } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const [consent, setConsent] = useState(false);
   const [title, setTitle] = useState('');
   const [keywords, setKeywords] = useState('');
   const [abstract, setAbstract] = useState('');
@@ -30,6 +35,7 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
 
   const handleInitialSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!consent) { setErrorMsg('Topshirish shartlariga rozilik bildiring.'); return; }
     if (!docxFile || !pdfFile) {
       setErrorMsg("Ikkala faylni ham (DOCX va PDF) yuklashingiz shart!");
       return;
@@ -44,6 +50,10 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
   };
 
   const handleFinalSubmit = async () => {
+    if (submitting) return;
+    if (!user) { setErrorMsg('Avval hisobingizga kiring.'); setIsPreviewOpen(false); return; }
+    setSubmitting(true);
+    try {
     const articleId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
     const newArticle = {
       id: articleId,
@@ -56,8 +66,10 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
       has_pdf: !!pdfFile,
       author_id: user?.id,
       status: 'pending',
-      volume: 3,
-      issue: 4
+      volume: JOURNAL.volume,
+      issue: JOURNAL.issue,
+      publication_year: JOURNAL.year,
+      created_at: new Date().toISOString()
     };
 
     if (isSupabaseConfigured) {
@@ -69,7 +81,7 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
         const { error } = await supabase.storage.from('articles_files').upload(`${newArticle.id}.pdf`, pdfFile, { upsert: true });
         pdfError = error;
       }
-      
+
       let docxError = null;
       if (docxFile) {
         const { error } = await supabase.storage.from('articles_files').upload(`${newArticle.id}.docx`, docxFile, { upsert: true });
@@ -88,6 +100,7 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
         return;
       }
     } else {
+      migrateLocalArchive();
       // Save to local storage to mock backend
       const fallbackArticle = { ...newArticle, authorEmail: user?.email, id: Date.now().toString(), date: new Date().toISOString() };
       const existingStr = localStorage.getItem('gjir_articles');
@@ -96,8 +109,8 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
     }
 
     setIsPreviewOpen(false);
-    alert("Maqolangiz muvaffaqiyatli yuborildi! Endi u Admin tomonidan tasdiqlanishi kutilmoqda.");
-    
+    alert(isSupabaseConfigured ? "Materialingiz yuborildi. 24–48 soat ichida ko‘rib chiqiladi." : "Namuna yozuv shu brauzerda saqlandi. Haqiqiy materialni email yoki Telegram orqali yuboring.");
+
     // Reset form
     setTitle('');
     setKeywords('');
@@ -106,8 +119,12 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
     setReviewerNotes('');
     setDocxFile(null);
     setPdfFile(null);
-    
+
     if (onSuccess) onSuccess();
+    } catch {
+      setIsPreviewOpen(false);
+      setErrorMsg('Yuborishda xatolik yuz berdi. Qayta urinib ko‘ring yoki email / Telegram orqali yuboring.');
+    } finally { setSubmitting(false); }
   };
 
   const inputStyle = {
@@ -137,8 +154,8 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
           Yangi maqola yuklash
         </h2>
         <p style={{ color: 'var(--muted)', fontSize: '14px', marginBottom: '2rem', lineHeight: '1.6' }}>
-          Iltimos, maqola ma'lumotlarini to'liq kiriting. <strong>DOCX va PDF</strong> variantlarining ikkalasini ham yuklash majburiydir. 
-          PDF variantning yuqori (header) va pastki (footer) qismida jurnal nomi hamda hoshiyasi bo'lishi shart.
+          Iltimos, maqola ma&apos;lumotlarini to&apos;liq kiriting. <strong>DOCX va PDF</strong> variantlarining ikkalasini ham yuklash majburiydir.
+          PDF variantning yuqori (header) va pastki (footer) qismida jurnal nomi hamda hoshiyasi bo&apos;lishi shart.
         </p>
 
         {errorMsg && (
@@ -148,6 +165,7 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
           </div>
         )}
 
+        <p className="submission-info">2026 · 1-jild, 3-son · 24–48 soat ichida ko‘rib chiqish. Maqola: 120 000 so‘m; tezis: 80 000 so‘m.</p>
         <form onSubmit={handleInitialSubmit}>
           <div style={{ marginBottom: '1.5rem' }}>
             <label style={labelStyle}>Maqola mavzusi nomi *</label>
@@ -155,7 +173,7 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
           </div>
 
           <div style={{ marginBottom: '1.5rem' }}>
-            <label style={labelStyle}>Kalit so'zlar *</label>
+            <label style={labelStyle}>Kalit so&apos;zlar *</label>
             <input type="text" required value={keywords} onChange={(e) => setKeywords(e.target.value)} placeholder="Sun'iy intellekt, ta'lim, innovatsiya..." style={inputStyle} />
           </div>
 
@@ -177,7 +195,7 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
               </div>
             ))}
             <button type="button" onClick={handleAddAuthor} style={{ background: 'transparent', color: 'var(--navy)', border: '1px dashed var(--navy)', padding: '8px 15px', borderRadius: '4px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <i className="ti ti-plus"></i> Muallif qo'shish
+              <i className="ti ti-plus"></i> Muallif qo&apos;shish
             </button>
           </div>
 
@@ -200,9 +218,10 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
             <textarea rows={3} value={reviewerNotes} onChange={(e) => setReviewerNotes(e.target.value)} placeholder="Qo'shimcha ma'lumotlar..." style={{ ...inputStyle, resize: 'vertical' }} />
           </div>
 
+          <label className="consent-label"><input type="checkbox" required checked={consent} onChange={e => setConsent(e.target.checked)} /><span><Link href="/offer" target="_blank">Ommaviy oferta</Link>, <Link href="/privacy" target="_blank">maxfiylik siyosati</Link> va <Link href="/security" target="_blank">xavfsizlik qoidalari</Link> bilan tanishdim. Material va fayllarni ko‘rib chiqish uchun yuborishga roziman.</span></label>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
             <button type="submit" style={{ background: 'var(--gold)', color: 'var(--navy)', border: 'none', padding: '12px 32px', borderRadius: '4px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <i className="ti ti-eye"></i> Ko'zdan kechirish
+              <i className="ti ti-eye"></i> Ko&apos;zdan kechirish
             </button>
           </div>
         </form>
@@ -213,32 +232,32 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(10,22,40,0.8)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
           <div style={{ background: '#fff', borderRadius: '8px', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', padding: '2rem', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
-              <h3 style={{ fontSize: '1.25rem', color: 'var(--navy)', fontFamily: '"Playfair Display", serif', margin: 0 }}>Ma'lumotlarni tasdiqlash</h3>
+              <h3 style={{ fontSize: '1.25rem', color: 'var(--navy)', fontFamily: '"Playfair Display", serif', margin: 0 }}>Ma&apos;lumotlarni tasdiqlash</h3>
               <button onClick={() => setIsPreviewOpen(false)} style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'var(--muted)' }}>&times;</button>
             </div>
-            
+
             <div style={{ marginBottom: '1.25rem' }}>
               <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Mavzu</div>
               <div style={{ fontSize: '15px', color: 'var(--navy)', fontWeight: 600 }}>{title}</div>
             </div>
-            
+
             <div style={{ marginBottom: '1.25rem' }}>
-              <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Kalit so'zlar</div>
+              <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Kalit so&apos;zlar</div>
               <div style={{ fontSize: '14px', color: 'var(--text)' }}>{keywords}</div>
             </div>
-            
+
             <div style={{ marginBottom: '1.25rem' }}>
               <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Abstract</div>
               <div style={{ fontSize: '14px', color: 'var(--text)', whiteSpace: 'pre-wrap', background: 'var(--cream)', padding: '10px', borderRadius: '4px' }}>{abstract}</div>
             </div>
-            
+
             <div style={{ marginBottom: '1.25rem' }}>
               <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Mualliflar</div>
               <ul style={{ paddingLeft: '20px', margin: 0, fontSize: '14px', color: 'var(--text)' }}>
                 {authors.filter(a => a.trim() !== '').map((a, i) => <li key={i}>{a}</li>)}
               </ul>
             </div>
-            
+
             <div style={{ marginBottom: '1.5rem' }}>
               <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Biriktirilgan fayllar</div>
               <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
@@ -251,8 +270,8 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
               <button onClick={() => setIsPreviewOpen(false)} style={{ background: 'var(--cream)', color: 'var(--navy)', border: 'none', padding: '10px 20px', borderRadius: '4px', fontWeight: 600, cursor: 'pointer' }}>
                 Tahrirlashga qaytish
               </button>
-              <button onClick={handleFinalSubmit} style={{ background: '#4CAF50', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: '4px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <i className="ti ti-check"></i> Tasdiqlash va Yuborish
+              <button disabled={submitting} onClick={handleFinalSubmit} style={{ background: '#4CAF50', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: '4px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <i className="ti ti-check"></i> {submitting ? 'Yuborilmoqda…' : 'Tasdiqlash va yuborish'}
               </button>
             </div>
           </div>

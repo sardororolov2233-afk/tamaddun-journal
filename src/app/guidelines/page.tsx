@@ -41,7 +41,7 @@ export default function GuidelinesPage() {
       step1: "Yuborish",
       step1Desc: "Muallif platforma orqali ro'yxatdan o'tadi va maqolani yuklaydi.",
       step2: "Taqriz",
-      step2Desc: "Maqola 2 ta mustaqil taqrizchiga yuboriladi (2-4 hafta).",
+      step2Desc: "Material 24–48 soat ichida dastlabki ko‘rib chiqiladi. Tuzatishlar va yakuniy nashr muddati muallif bilan kelishiladi.",
       step3: "Tahrirlash",
       step3Desc: "Muallif taqrizchilar mulohazalari asosida maqolani to'g'rilaydi.",
       step4: "Chop etish",
@@ -87,7 +87,7 @@ export default function GuidelinesPage() {
       step1: "Отправка",
       step1Desc: "Автор регистрируется на платформе и загружает файл статьи.",
       step2: "Рецензирование",
-      step2Desc: "Статья отправляется двум независимым рецензентам (2-4 недели).",
+      step2Desc: "Первичное рассмотрение в течение 24–48 часов. Сроки исправлений и публикации согласуются с автором.",
       step3: "Доработка",
       step3Desc: "Автор исправляет статью на основе комментариев рецензентов.",
       step4: "Публикация",
@@ -133,7 +133,7 @@ export default function GuidelinesPage() {
       step1: "Submission",
       step1Desc: "The author registers on the portal and uploads the manuscript file.",
       step2: "Peer Review",
-      step2Desc: "The paper is evaluated by 2 independent peer reviewers (takes 2-4 weeks).",
+      step2Desc: "Initial review within 24–48 hours. Revisions and final publication timing are agreed with the author.",
       step3: "Revision",
       step3Desc: "The author revises the paper based on peer reviewer feedback.",
       step4: "Publication",
@@ -266,7 +266,7 @@ export default function GuidelinesPage() {
               {t.apcDesc}
             </p>
           </div>
-          <Link href="/login" className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', width: 'fit-content', border: '1px solid var(--navy)', color: 'var(--navy)', textDecoration: 'none' }}>
+          <Link href="/submit" className="btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', width: 'fit-content', border: '1px solid var(--navy)', color: 'var(--navy)', textDecoration: 'none' }}>
             {lang === 'UZ' ? 'Kabinetga kirish' : lang === 'RU' ? 'В личный кабинет' : 'Go to Dashboard'} <i className="ti ti-arrow-right"></i>
           </Link>
         </div>

@@ -58,7 +58,7 @@ export const dictionaries = {
       inProgress: "(jarayonda)"
     },
     footer: {
-      desc: "Tamaddun ko'p tarmoqli, ochiq kirish ilmiy jurnal bo'lib, 2022 yildan faoliyat yuritadi. Maqolalar ikki tomonlama ko'r-ko'r taqriz (double-blind peer review) usuli bilan baholanadi.",
+      desc: "Tamaddun ko'p tarmoqli, ochiq kirish ilmiy jurnal bo'lib, 2026 yildan faoliyat yuritadi. Maqolalar ikki tomonlama ko'r-ko'r taqriz (double-blind peer review) usuli bilan baholanadi.",
       journal: "Jurnal",
       editorialBoard: "Muharrirlar Kengashi",
       ethics: "Etika Qoidalari",
@@ -151,7 +151,7 @@ export const dictionaries = {
       inProgress: "(в процессе)"
     },
     footer: {
-      desc: "Tamaddun — это многопрофильный научный журнал, работающий с 2022 года. Статьи проходят двойное слепое рецензирование.",
+      desc: "Tamaddun — это многопрофильный научный журнал, работающий с 2026 года. Статьи проходят двойное слепое рецензирование.",
       journal: "Журнал",
       editorialBoard: "Редакционная коллегия",
       ethics: "Этика публикаций",
@@ -244,7 +244,7 @@ export const dictionaries = {
       inProgress: "(in progress)"
     },
     footer: {
-      desc: "Tamaddun is a multidisciplinary open access scientific journal operating since 2022. Articles are evaluated via double-blind peer review.",
+      desc: "Tamaddun is a multidisciplinary open access scientific journal operating since 2026. Articles are evaluated via double-blind peer review.",
       journal: "Journal",
       editorialBoard: "Editorial Board",
       ethics: "Ethics Guidelines",

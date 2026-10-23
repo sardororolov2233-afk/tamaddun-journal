@@ -1,4 +1,5 @@
 "use client";
+import JournalMark from "./JournalMark";
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -16,14 +17,14 @@ export default function Navbar() {
   return (
     <nav className="site-nav" aria-label={menuLabel}>
       <Link href="/" className="nav-brand" onClick={() => setMenuPath(null)}>
-        <div className="nav-logo" aria-hidden="true">✳︎</div>
+        <div className="nav-logo" aria-hidden="true"><JournalMark /></div>
         <div><div className="nav-name">Tamaddun<span>®</span></div><div className="nav-abbr">ILMIY JURNAL · SCIENTIFIC JOURNAL</div></div>
       </Link>
       <button className="menu-toggle" aria-expanded={open} aria-controls="primary-navigation" onClick={() => setMenuPath(open ? null : pathname)}>{open ? '×' : '☰'} <span>{menuLabel}</span></button>
       <div id="primary-navigation" className={`nav-links ${open ? 'is-open' : ''}`} onKeyDown={e => { if (e.key === 'Escape') setMenuPath(null); }}>
         {([['/archive', t.nav.archive], ['/about', t.nav.about], ['/guidelines', t.nav.guidelines], ['/login', t.nav.login]]).map(([href, label]) => <Link key={href} href={href} aria-current={pathname === href ? 'page' : undefined} onClick={() => setMenuPath(null)}>{label}</Link>)}
         <LanguageSwitcher />
-        <Link href="/login" className="btn-submit" onClick={() => setMenuPath(null)}>{t.nav.submit} <span aria-hidden="true">↗</span></Link>
+        <Link href="/submit" className="btn-submit" onClick={() => setMenuPath(null)}>{t.nav.submit} <span aria-hidden="true">→</span></Link>
       </div>
     </nav>
   );

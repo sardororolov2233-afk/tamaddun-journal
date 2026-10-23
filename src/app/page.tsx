@@ -1,80 +1,16 @@
 "use client";
+import JournalMark from "../components/JournalMark";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "../context/LanguageContext";
 import { supabase } from "../lib/supabaseClient";
+import { JOURNAL, articlePath, type JournalArticle as Article } from "../lib/journal";
+import { loadPublishedArticles } from "../lib/journalRepository";
+import AdmissionBanner from "../components/AdmissionBanner";
 
 // Boshlang'ich mock maqolalar (bazada maqolalar yo'qligida ko'rsatish uchun)
-const DEFAULT_ARTICLES = [
-  {
-    id: "1",
-    title: "CRISPR-Cas9 texnologiyasi yordamida irsiy kasalliklarni davolashning yangi yondashuvlari",
-    authors: "Karimov A.B., Yusupova N.K., Chen L.",
-    affiliation: "Toshkent Tibbiyot Universiteti",
-    abstract: "Ushbu tadqiqot CRISPR-Cas9 genni tahrirlash texnologiyasidan foydalangan holda monogen kasalliklarni in vivo sharoitda bartaraf etishning yangi usullarini taqdim etadi. Olib borilgan tajribalar natijasida β-talassemiya kasalligi bilan og'rigan in vitro modellarida 87% samaradorlik ko'rsatkichi erishildi.",
-    keywords: "CRISPR-Cas9, gen tahrirlash, irsiy kasalliklar, β-talassemiya",
-    field: "Biotibbiyot",
-    status: "published",
-    volume: 4,
-    issue: 2,
-    created_at: "2025-05-12T12:00:00.000Z",
-    doi: "10.36001/tamaddun.2025.4.2.001",
-    has_docx: true,
-    has_pdf: true
-  },
-  {
-    id: "2",
-    title: "O'rta Osiyo mamlakatlari eksport diversifikatsiyasi: Raqamli iqtisodiyot sektori tahlili",
-    authors: "Toshmatov I.O., Rakhimova D.S.",
-    affiliation: "Iqtisodiyot Instituti, Samarqand",
-    abstract: "Maqolada O'zbekiston, Qozog'iston va Qirg'iziston iqtisodiyotlarida raqamli sektor eksport ulushini oshirishning makroiqtisodiy modeli taqdim etiladi. Panel ma'lumotlari asosida VECM modelidan foydalanib, 2010–2024 yillar oraliq statistikasi tahlil qilinadi.",
-    keywords: "eksport diversifikatsiyasi, raqamli iqtisodiyot, O'rta Osiyo",
-    field: "Iqtisodiyot",
-    status: "published",
-    volume: 4,
-    issue: 2,
-    created_at: "2025-05-07T12:00:00.000Z",
-    doi: "10.36001/tamaddun.2025.4.2.002",
-    has_docx: true,
-    has_pdf: true
-  },
-  {
-    id: "3",
-    title: "Kam resursli muhitlarda tabiiy tilni qayta ishlashda transformer modellarini optimallashtirish",
-    authors: "Mirzayev J.T., Abdullayeva M.F., Kim S.H.",
-    affiliation: "INHA University in Tashkent",
-    abstract: "Ushbu ish o'zbek va tojik tillarini qayta ishlashga mo'ljallangan engil transformer arxitekturasini taklif etadi. LoRA (Low-Rank Adaptation) usuli qo'llanilganda parametrlar soni 93% kamaytirildi, F1-score ko'rsatkichi esa etalon modellar bilan raqobatbardosh bo'lib qoldi.",
-    keywords: "NLP, transformer, LoRA, o'zbek tili",
-    field: "Informatika",
-    status: "published",
-    volume: 4,
-    issue: 2,
-    created_at: "2025-05-01T12:00:00.000Z",
-    doi: "10.36001/tamaddun.2025.4.2.003",
-    has_docx: true,
-    has_pdf: true
-  },
-  {
-    id: "4",
-    title: "Qorakumdan olingan zeolitlar asosida yangi sorbentlar sintezi va ularning ekologik xususiyatlari",
-    authors: "Xoliqov B.A., Saidova G.R.",
-    affiliation: "Kimyo Fanlari Instituti, Toshkent",
-    abstract: "Tabiiy zeolitlar asosida ishlab chiqilgan kompozit sorbentlarning og'ir metallarni (Pb, Cd, Cr) suvli eritmasilardan ushlab qolish samaradorligi o'rganildi. Sintez qilingan namunalar BET tahlili va SEM-EDX usullari bilan xarakterlandi.",
-    keywords: "zeolit, sorbent, og'ir metallar",
-    field: "Kimyo",
-    status: "published",
-    volume: 4,
-    issue: 2,
-    created_at: "2025-04-28T12:00:00.000Z",
-    doi: "10.36001/tamaddun.2025.4.2.004",
-    has_docx: true,
-    has_pdf: true
-  }
-];
-
-type Article = Omit<(typeof DEFAULT_ARTICLES)[number], 'authors'> & { authors: string | string[]; date?: string };
 
 export default function Home() {
   const router = useRouter();
@@ -95,38 +31,9 @@ export default function Home() {
 
   useEffect(() => {
     const fetchArticles = async () => {
-      let dbArticles: Article[] = [];
-
-      if (isSupabaseConfigured) {
-        const { data, error } = await supabase
-          .from('articles')
-          .select('*')
-          .eq('status', 'published')
-          .order('created_at', { ascending: false });
-
-        if (data && !error) {
-          dbArticles = data;
-        }
-      } else {
-        const saved = localStorage.getItem('gjir_articles');
-        if (saved) {
-          try {
-            const parsed: unknown = JSON.parse(saved);
-            if (Array.isArray(parsed)) dbArticles = parsed.filter((a): a is Article => !!a && typeof a.id === 'string' && typeof a.title === 'string' && a.status === 'published');
-          } catch { /* Ignore invalid demo storage and retain sample articles. */ }
-        }
-      }
-
-      // Merge database/localStorage articles with fallback articles
-      const combined = [...dbArticles];
-      if (!isSupabaseConfigured) DEFAULT_ARTICLES.forEach(mockArt => {
-        if (!combined.some(c => c.id === mockArt.id || c.title.toLowerCase() === mockArt.title.toLowerCase())) {
-          combined.push(mockArt);
-        }
-      });
-
-      setArticles(combined);
-      setLoading(false);
+      try { setArticles(await loadPublishedArticles()); }
+      catch { setArticles([]); }
+      finally { setLoading(false); }
     };
 
     fetchArticles();
@@ -142,8 +49,8 @@ export default function Home() {
   };
 
   const getPdfUrl = (art: Article) => {
-    if (isSupabaseConfigured && art.id.length > 5) {
-      const { data } = supabase.storage.from('articles_files').getPublicUrl(`${art.id}.pdf`);
+    if (isSupabaseConfigured && art.has_pdf) {
+      const { data } = supabase.storage.from('articles_files').getPublicUrl(`${art.kind === "thesis" ? "theses/" : ""}${art.id}.pdf`);
       return data.publicUrl;
     }
     return '#';
@@ -151,7 +58,7 @@ export default function Home() {
 
   const getDisplayArticles = () => articles
     .filter(article => activeTab === "All" || article.field === activeTab)
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .sort((a, b) => new Date(b.created_at || b.date || 0).getTime() - new Date(a.created_at || a.date || 0).getTime())
     .slice(0, 5);
   const copy = {
     UZ: { label: "ILM. IZLANISH. TARAQQIYOT.", discover: "Yangi bilimlar shu yerdan boshlanadi", disciplines: "Ilmiy yo‘nalishlar", access: "Erkin foydalanish", sample: "Namuna maqolalar", all: "Barcha maqolalar", empty: "Bu yo‘nalishda maqola topilmadi.", details: "Maqolani o‘qish", year: "Barcha yillar", fields: "Ilmiy soha" },
@@ -161,23 +68,24 @@ export default function Home() {
 
   return (
     <>
+      <AdmissionBanner />
       <h2 className="sr-only">Tamaddun — jurnal bosh sahifasi</h2>
 
       <div className="hero">
-        <div className="hero-eyebrow">{copy.label}<span>EST. 2022 / TAMADDUN</span></div>
+        <div className="hero-eyebrow">{copy.label}<span>EST. 2026 / TAMADDUN</span></div>
         <div className="hero-inner">
           <div className="hero-badge"><i className="ti ti-award" aria-hidden="true"></i>{t.hero.badge}</div>
           <h1>{t.hero.title1}<em>{t.hero.title2}</em></h1>
           <p>{t.hero.desc}</p>
           <div className="hero-actions">
-            <Link href="/login" className="btn-primary" style={{ display: 'inline-block', textDecoration: 'none' }}>{t.hero.btnPrimary}</Link>
+            <Link href="/submit" className="btn-primary" style={{ display: 'inline-block', textDecoration: 'none' }}>{t.hero.btnPrimary}</Link>
             <Link href="/archive" className="btn-outline" style={{ display: 'inline-block', textDecoration: 'none' }}>{t.hero.btnOutline}</Link>
           </div>
         </div>
         <Link href="/archive" className="journal-art" aria-label={t.hero.btnOutline}>
           <div className="orbit orbit-one" /><div className="orbit orbit-two" />
-          <div className="journal-cover"><span className="cover-top">ILMIY JURNAL / SCIENTIFIC JOURNAL</span><strong>Tamaddun<span>∗</span></strong><div className="cover-symbol" aria-hidden="true">✳︎</div><div className="cover-bottom"><span>ILM-FAN<br />CHEGARASIZ.</span><span>OPEN<br />ACCESS ↗</span></div></div>
-          <span className="art-caption">{copy.discover} ↗</span>
+          <div className="journal-cover"><span className="cover-top">ILMIY JURNAL / SCIENTIFIC JOURNAL</span><strong>Tamaddun<span>∗</span></strong><div className="cover-symbol" aria-hidden="true"><JournalMark /></div><div className="cover-bottom"><span>ILM-FAN<br />CHEGARASIZ.</span><span>OPEN<br />ACCESS →</span></div></div>
+          <span className="art-caption">{copy.discover} →</span>
         </Link>
         <div className="hero-stats">
           <div className="stat-card"><div className="stat-num">{articles.length.toString().padStart(2, '0')}</div><div className="stat-label">{isSupabaseConfigured ? t.stats.published : copy.sample}</div></div>
@@ -247,7 +155,7 @@ export default function Home() {
                   <div className="article-meta">
                     <span className="tag tag-field">{article.field || "Biotibbiyot"}</span>
                     <span className="tag tag-open">Open Access</span>
-                    {loadedAt - new Date(article.created_at).getTime() >= 0 && loadedAt - new Date(article.created_at).getTime() < 30 * 86400000 && (
+                    {loadedAt - new Date(article.created_at || article.date || 0).getTime() >= 0 && loadedAt - new Date(article.created_at || article.date || 0).getTime() < 30 * 86400000 && (
                       <span className="tag tag-new">Yangi</span>
                     )}
                     <span className="article-date">
@@ -259,7 +167,7 @@ export default function Home() {
                     </span>
                   </div>
                   <h3>
-                    <Link href={`/article/${article.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Link href={articlePath(article)} style={{ color: 'inherit', textDecoration: 'none' }}>
                       {article.title}
                     </Link>
                   </h3>
@@ -273,12 +181,12 @@ export default function Home() {
                   <div className="article-actions">
                     {getPdfUrl(article) !== '#' ? <a href={getPdfUrl(article)} target="_blank" rel="noopener noreferrer" className="btn-pdf" style={{ textDecoration: 'none' }}>
                       <i className="ti ti-file-type-pdf" aria-hidden="true" style={{ color: '#e53935' }}></i> PDF yuklash
-                    </a> : <Link href={`/article/${article.id}`} className="btn-pdf">{copy.details} ↗</Link>}
-                    <Link href={`/article/${article.id}/certificate`} target="_blank" className="btn-cite" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    </a> : <Link href={articlePath(article)} className="btn-pdf">{copy.details} →</Link>}
+                    {isSupabaseConfigured && article.kind !== 'thesis' && <Link href={`/article/${article.id}/certificate`} target="_blank" className="btn-cite" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <i className="ti ti-certificate" aria-hidden="true" style={{ color: 'var(--gold)' }}></i> Sertifikat
-                    </Link>
+                    </Link>}
                     <span className="doi">
-                      {article.doi || `DOI: 10.36001/tamaddun.2025.${article.volume}.${article.issue}.${article.id.slice(0, 5)}`}
+                      {article.doi ? `DOI: ${article.doi}` : `${article.publication_year || 2026} · ${article.volume}-jild, ${article.issue}-son`}
                     </span>
                   </div>
                 </div>
@@ -290,17 +198,17 @@ export default function Home() {
         <div className="sidebar">
           <div className="volume-card">
             <div className="vol-label">{t.sidebar.currentIssue}</div>
-            <div className="vol-num">Jild 4, Son 2</div>
-            <div className="vol-date">2025 · May–Iyun</div>
+            <div className="vol-num">Jild {JOURNAL.volume}, Son {JOURNAL.issue}</div>
+            <div className="vol-date">2026 · Qabul davom etmoqda</div>
             <hr className="vol-divider" />
-            <div className="vol-stat"><span>{t.sidebar.articles}</span><strong>{articles.length}</strong></div>
+            <div className="vol-stat"><span>{t.sidebar.articles}</span><strong>{articles.filter(a => a.volume === JOURNAL.volume && a.issue === JOURNAL.issue).length}</strong></div>
             <Link href="/archive" className="issue-link">{t.tabs.viewAll}</Link>
           </div>
 
           <div className="sidebar-section">
             <h3>{t.sidebar.quickLinks}</h3>
-            <Link href="/login" className="quick-link" style={{ textDecoration: 'none' }}><i className="ti ti-upload" aria-hidden="true"></i>{t.nav.submit}</Link>
-            <Link href="/login" className="quick-link" style={{ textDecoration: 'none' }}><i className="ti ti-notes" aria-hidden="true"></i>{lang === 'UZ' ? 'Tezis yuborish' : lang === 'RU' ? 'Отправить тезис' : 'Submit Thesis'}</Link>
+            <Link href="/submit" className="quick-link" style={{ textDecoration: 'none' }}><i className="ti ti-upload" aria-hidden="true"></i>{t.nav.submit}</Link>
+            <Link href="/submit" className="quick-link" style={{ textDecoration: 'none' }}><i className="ti ti-notes" aria-hidden="true"></i>{lang === 'UZ' ? 'Tezis yuborish' : lang === 'RU' ? 'Отправить тезис' : 'Submit Thesis'}</Link>
             <Link href="/track" className="quick-link" style={{ textDecoration: 'none' }}><i className="ti ti-clock" aria-hidden="true"></i>{t.sidebar.track}</Link>
             <Link href="/apc" className="quick-link" style={{ textDecoration: 'none' }}><i className="ti ti-currency-dollar" aria-hidden="true"></i>{t.sidebar.apc}</Link>
             <Link href="/guidelines" className="quick-link" style={{ textDecoration: 'none' }}><i className="ti ti-book" aria-hidden="true"></i>{t.sidebar.authorGuide}</Link>

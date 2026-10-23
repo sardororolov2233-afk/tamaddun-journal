@@ -2,11 +2,13 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import PublicationFields, { CURRENT_TARGET } from './PublicationFields';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function UploadVolumeForm({ onSuccess }: { onSuccess?: () => void }) {
   const { isSupabaseConfigured } = useAuth();
   const { lang } = useLanguage();
+  const [target, setTarget] = useState(CURRENT_TARGET);
   const [title, setTitle] = useState('');
   const [field, setField] = useState('Pedagogika');
   const [customField, setCustomField] = useState('');
@@ -62,7 +64,7 @@ export default function UploadVolumeForm({ onSuccess }: { onSuccess?: () => void
           const { error: imgError } = await supabase.storage
             .from('articles_files')
             .upload(imagePath, coverImage, { upsert: true });
-            
+
           if (!imgError) {
             const { data: imgUrlData } = supabase.storage
               .from('articles_files')
@@ -77,6 +79,7 @@ export default function UploadVolumeForm({ onSuccess }: { onSuccess?: () => void
           .insert([
             {
               id: volumeId,
+              ...target,
               title,
               comment,
               field: selectedField,
@@ -92,6 +95,7 @@ export default function UploadVolumeForm({ onSuccess }: { onSuccess?: () => void
         // localStorage mock
         const newVolume = {
           id: volumeId,
+          ...target,
           title,
           comment,
           field: selectedField,
@@ -110,8 +114,8 @@ export default function UploadVolumeForm({ onSuccess }: { onSuccess?: () => void
       setPdfFile(null);
       setCoverImage(null);
       if (onSuccess) onSuccess();
-    } catch (err: any) {
-      setErrorMsg(err.message || "Xatolik yuz berdi");
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Xatolik yuz berdi");
     } finally {
       setLoading(false);
     }
@@ -152,23 +156,24 @@ export default function UploadVolumeForm({ onSuccess }: { onSuccess?: () => void
       )}
 
       <form onSubmit={handleSubmit}>
+        <PublicationFields value={target} onChange={setTarget} />
         <div>
           <label style={labelStyle}>{lang === 'UZ' ? "Jild/Nashr nomi (Sarlavha) *" : "Название тома/выпуска *"}</label>
-          <input 
-            type="text" 
-            required 
-            value={title} 
-            onChange={(e) => setTitle(e.target.value)} 
-            placeholder={lang === 'UZ' ? "Masalan: 5-Jild, 1-Son (2026)" : "Например: Том 5, Выпуск 1 (2026)"} 
-            style={inputStyle} 
+          <input
+            type="text"
+            required
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder={lang === 'UZ' ? "Masalan: 1-Jild, 3-Son (2026)" : "Например: Том 1, Выпуск 3 (2026)"}
+            style={inputStyle}
           />
         </div>
 
         <div>
           <label style={labelStyle}>{lang === 'UZ' ? "Soha (Yo'nalish) *" : "Сфера/Направление *"}</label>
-          <select 
-            value={field} 
-            onChange={(e) => setField(e.target.value)} 
+          <select
+            value={field}
+            onChange={(e) => setField(e.target.value)}
             style={inputStyle}
           >
             <option value="Pedagogika">Pedagogika</option>
@@ -177,32 +182,32 @@ export default function UploadVolumeForm({ onSuccess }: { onSuccess?: () => void
             <option value="Biotibbiyot">Biotibbiyot</option>
             <option value="Informatika">Informatika</option>
             <option value="Iqtisodiyot">Iqtisodiyot</option>
-            <option value="Boshqa">Boshqa (O'zingiz kiriting)</option>
+            <option value="Boshqa">Boshqa (O&apos;zingiz kiriting)</option>
           </select>
         </div>
 
         {field === 'Boshqa' && (
           <div>
             <label style={labelStyle}>{lang === 'UZ' ? "Soha nomini yozing *" : "Введите название сферы *"}</label>
-            <input 
-              type="text" 
-              required 
-              value={customField} 
-              onChange={(e) => setCustomField(e.target.value)} 
-              placeholder={lang === 'UZ' ? "Masalan: Kimyo" : "Например: Химия"} 
-              style={inputStyle} 
+            <input
+              type="text"
+              required
+              value={customField}
+              onChange={(e) => setCustomField(e.target.value)}
+              placeholder={lang === 'UZ' ? "Masalan: Kimyo" : "Например: Химия"}
+              style={inputStyle}
             />
           </div>
         )}
 
         <div>
           <label style={labelStyle}>{lang === 'UZ' ? "Jild uchun tahririyat sharhi / Annotatsiya" : "Комментарий редакции / Аннотация к тому"}</label>
-          <textarea 
-            rows={4} 
-            value={comment} 
-            onChange={(e) => setComment(e.target.value)} 
-            placeholder={lang === 'UZ' ? "Ushbu jildda chop etilgan ilmiy maqolalar haqida umumiy tahririyat xulosasi..." : "Общий комментарий к опубликованным в этом томе статьям..."} 
-            style={{ ...inputStyle, resize: 'vertical' }} 
+          <textarea
+            rows={4}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder={lang === 'UZ' ? "Ushbu jildda chop etilgan ilmiy maqolalar haqida umumiy tahririyat xulosasi..." : "Общий комментарий к опубликованным в этом томе статьям..."}
+            style={{ ...inputStyle, resize: 'vertical' }}
           />
         </div>
 
@@ -212,12 +217,12 @@ export default function UploadVolumeForm({ onSuccess }: { onSuccess?: () => void
             <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)', marginBottom: '5px' }}>
               {lang === 'UZ' ? `PDF shaklidagi to'liq kitob ${pdfFile ? '✅' : '*'}` : `Полная книга в формате PDF ${pdfFile ? '✅' : '*'}`}
             </div>
-            <input 
-              type="file" 
-              accept=".pdf" 
+            <input
+              type="file"
+              accept=".pdf"
               required
-              onChange={(e) => setPdfFile(e.target.files ? e.target.files[0] : null)} 
-              style={{ fontSize: '13px', width: '100%' }} 
+              onChange={(e) => setPdfFile(e.target.files ? e.target.files[0] : null)}
+              style={{ fontSize: '13px', width: '100%' }}
             />
           </div>
 
@@ -226,20 +231,20 @@ export default function UploadVolumeForm({ onSuccess }: { onSuccess?: () => void
             <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)', marginBottom: '5px' }}>
               {lang === 'UZ' ? `Jild muqovasi (Rasm) ${coverImage ? '✅' : ''}` : `Обложка тома (Фото) ${coverImage ? '✅' : ''}`}
             </div>
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={(e) => setCoverImage(e.target.files ? e.target.files[0] : null)} 
-              style={{ fontSize: '13px', width: '100%' }} 
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setCoverImage(e.target.files ? e.target.files[0] : null)}
+              style={{ fontSize: '13px', width: '100%' }}
             />
           </div>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <button 
-            type="submit" 
-            disabled={loading} 
-            className="btn-primary" 
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-primary"
             style={{ padding: '12px 32px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}
           >
             {loading ? (lang === 'UZ' ? "Yuklanmoqda..." : "Загрузка...") : (lang === 'UZ' ? "Yuklash" : "Загрузить")}

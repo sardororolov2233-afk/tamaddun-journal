@@ -101,14 +101,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           { id: data.user.id, email, full_name: email.split('@')[0], role }
         ]);
         alert("Muvaffaqiyatli ro'yxatdan o'tdingiz!");
-        router.push('/dashboard');
+        router.push(new URLSearchParams(window.location.search).get('next') === '/submit' ? '/submit' : '/dashboard');
       }
     } else {
       // Mock logic
       const newUser = { id: Date.now().toString(), name: email.split('@')[0], email, role };
       setUser(newUser);
       localStorage.setItem('gjir_user', JSON.stringify(newUser));
-      router.push('/dashboard');
+      router.push(new URLSearchParams(window.location.search).get('next') === '/submit' ? '/submit' : '/dashboard');
     }
   };
 
@@ -122,13 +122,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         alert("Xatolik: " + error.message);
         return;
       }
-      router.push('/dashboard');
+      router.push(new URLSearchParams(window.location.search).get('next') === '/submit' ? '/submit' : '/dashboard');
     } else {
       // Mock logic
       const newUser = { id: Date.now().toString(), name: email.split('@')[0], email, role };
       setUser(newUser);
       localStorage.setItem('gjir_user', JSON.stringify(newUser));
-      router.push('/dashboard');
+      router.push(new URLSearchParams(window.location.search).get('next') === '/submit' ? '/submit' : '/dashboard');
     }
   };
 

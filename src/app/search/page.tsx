@@ -1,78 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, Suspense, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
+import { articleYear, articlePath, type JournalArticle } from '../../lib/journal';
+import { loadPublishedArticles } from '../../lib/journalRepository';
 import { useLanguage } from '../../context/LanguageContext';
-
-// Boshlang'ich mock maqolalar (qidiruv va arxiv uchun)
-const DEFAULT_ARTICLES = [
-  {
-    id: "1",
-    title: "CRISPR-Cas9 texnologiyasi yordamida irsiy kasalliklarni davolashning yangi yondashuvlari",
-    authors: ["Karimov A.B.", "Yusupova N.K.", "Chen L."],
-    affiliation: "Toshkent Tibbiyot Universiteti",
-    abstract: "Ushbu tadqiqot CRISPR-Cas9 genni tahrirlash texnologiyasidan foydalangan holda monogen kasalliklarni in vivo sharoitda bartaraf etishning yangi usullarini taqdim etadi. Olib borilgan tajribalar natijasida β-talassemiya kasalligi bilan og'rigan in vitro modellarida 87% samaradorlik ko'rsatkichi erishildi.",
-    keywords: "CRISPR-Cas9, gen tahrirlash, irsiy kasalliklar, β-talassemiya, biotibbiyot",
-    field: "Biotibbiyot",
-    status: "published",
-    volume: 4,
-    issue: 2,
-    created_at: "2025-05-12T12:00:00.000Z",
-    doi: "10.36001/tamaddun.2025.4.2.001",
-    has_docx: true,
-    has_pdf: true
-  },
-  {
-    id: "2",
-    title: "O'rta Osiyo mamlakatlari eksport diversifikatsiyasi: Raqamli iqtisodiyot sektori tahlili",
-    authors: ["Toshmatov I.O.", "Rakhimova D.S."],
-    affiliation: "Iqtisodiyot Instituti, Samarqand",
-    abstract: "Maqolada O'zbekiston, Qozog'iston va Qirg'iziston iqtisodiyotlarida raqamli sektor eksport ulushini oshirishning makroiqtisodiy modeli taqdim etiladi. Panel ma'lumotlari asosida VECM modelidan foydalanib, 2010–2024 yillar oraliq statistikasi tahlil qilinadi.",
-    keywords: "eksport diversifikatsiyasi, raqamli iqtisodiyot, O'rta Osiyo, VECM modeli, iqtisodiyot",
-    field: "Iqtisodiyot",
-    status: "published",
-    volume: 4,
-    issue: 2,
-    created_at: "2025-05-07T12:00:00.000Z",
-    doi: "10.36001/tamaddun.2025.4.2.002",
-    has_docx: true,
-    has_pdf: true
-  },
-  {
-    id: "3",
-    title: "Kam resursli muhitlarda tabiiy tilni qayta ishlashda transformer modellarini optimallashtirish",
-    authors: ["Mirzayev J.T.", "Abdullayeva M.F.", "Kim S.H."],
-    affiliation: "INHA University in Tashkent",
-    abstract: "Ushbu ish o'zbek va tojik tillarini qayta ishlashga mo'ljallangan engil transformer arxitekturasini taklif etadi. LoRA (Low-Rank Adaptation) usuli qo'llanilganda parametrlar soni 93% kamaytirildi, F1-score ko'rsatkichi esa etalon modellar bilan raqobatbardosh bo'lib qoldi.",
-    keywords: "NLP, tabiiy tilni qayta ishlash, transformer, LoRA, o'zbek tili, informatika",
-    field: "Informatika",
-    status: "published",
-    volume: 4,
-    issue: 2,
-    created_at: "2025-05-01T12:00:00.000Z",
-    doi: "10.36001/tamaddun.2025.4.2.003",
-    has_docx: true,
-    has_pdf: true
-  },
-  {
-    id: "4",
-    title: "Qorakumdan olingan zeolitlar asosida yangi sorbentlar sintezi va ularning ekologik xususiyatlari",
-    authors: ["Xoliqov B.A.", "Saidova G.R."],
-    affiliation: "Kimyo Fanlari Instituti, Toshkent",
-    abstract: "Tabiiy zeolitlar asosida ishlab chiqilgan kompozit sorbentlarning og'ir metallarni (Pb, Cd, Cr) suvli eritmasilardan ushlab qolish samaradorligi o'rganildi. Sintez qilingan namunalar BET tahlili va SEM-EDX usullari bilan xarakterlandi.",
-    keywords: "zeolit, sorbent, og'ir metallar, adsorbsiya, ekologiya, kimyo",
-    field: "Kimyo",
-    status: "published",
-    volume: 4,
-    issue: 2,
-    created_at: "2026-04-28T12:00:00.000Z",
-    doi: "10.36001/tamaddun.2025.4.2.004",
-    has_docx: true,
-    has_pdf: true
-  }
-];
 
 function SearchContent() {
   const searchParams = useSearchParams();
@@ -87,53 +21,26 @@ function SearchContent() {
   const [field, setField] = useState(initialField);
   const [year, setYear] = useState(initialYear);
 
-  const [articles, setArticles] = useState<any[]>([]);
-  const [filteredArticles, setFilteredArticles] = useState<any[]>([]);
+  const [articles, setArticles] = useState<JournalArticle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const isSupabaseConfigured = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL.startsWith('http'));
 
   // Maqolalarni yuklash
   useEffect(() => {
     const fetchArticles = async () => {
-      let dbArticles: any[] = [];
-
-      if (isSupabaseConfigured) {
-        const { data, error } = await supabase
-          .from('articles')
-          .select('*')
-          .eq('status', 'published')
-          .order('created_at', { ascending: false });
-
-        if (data && !error) {
-          dbArticles = data;
-        }
-      } else {
-        const saved = localStorage.getItem('gjir_articles');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          dbArticles = parsed.filter((a: any) => a.status === 'published');
-        }
-      }
-
-      // Mock ma'lumotlar bilan birlashtirish (ID takrorlanmasligi uchun)
-      const combined = [...dbArticles];
-      DEFAULT_ARTICLES.forEach(mockArt => {
-        if (!combined.some(c => c.id === mockArt.id || c.title.toLowerCase() === mockArt.title.toLowerCase())) {
-          combined.push(mockArt);
-        }
-      });
-
-      setArticles(combined);
-      setLoading(false);
+      try { setArticles(await loadPublishedArticles()); }
+      catch { setError('Qidiruv ma’lumotlarini yuklab bo‘lmadi. Qayta urinib ko‘ring.'); }
+      finally { setLoading(false); }
     };
 
     fetchArticles();
   }, [isSupabaseConfigured]);
 
   // Qidiruv va filtrlash mantiqi
-  useEffect(() => {
-    if (loading) return;
+  const filteredArticles = useMemo(() => {
+    if (loading) return [];
 
     let result = [...articles];
 
@@ -177,7 +84,7 @@ function SearchContent() {
     // Yil bo'yicha filtr
     if (year !== 'All') {
       result = result.filter(art => {
-        const artYear = new Date(art.created_at || art.date || Date.now()).getFullYear().toString();
+        const artYear = articleYear(art).toString();
         if (year === '2024–2025') {
           return artYear === '2024' || artYear === '2025';
         }
@@ -185,7 +92,7 @@ function SearchContent() {
       });
     }
 
-    setFilteredArticles(result);
+    return result;
   }, [query, field, year, articles, loading, t]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -198,9 +105,9 @@ function SearchContent() {
     router.push(`/search?${params.toString()}`);
   };
 
-  const getPdfUrl = (art: any) => {
+  const getPdfUrl = (art: JournalArticle) => {
     if (isSupabaseConfigured && art.id.length > 5) {
-      const { data } = supabase.storage.from('articles_files').getPublicUrl(`${art.id}.pdf`);
+      const { data } = supabase.storage.from('articles_files').getPublicUrl(`${art.kind === "thesis" ? "theses/" : ""}${art.id}.pdf`);
       return data.publicUrl;
     }
     return '#';
@@ -212,6 +119,7 @@ function SearchContent() {
         {lang === 'UZ' ? 'Ilmiy Maqolalar Qidiruvi' : lang === 'RU' ? 'Поиск научных статей' : 'Search Scientific Articles'}
       </h1>
 
+      {error && <p role="alert" className="error-notice">{error}</p>}
       {/* Qidiruv Paneli */}
       <form onSubmit={handleSearchSubmit} style={{ 
         background: '#fff', 
@@ -320,7 +228,7 @@ function SearchContent() {
                   <span className="tag tag-field">{art.field || 'Ilmiy soha'}</span>
                   <span className="tag tag-open">Open Access</span>
                   <span style={{ fontSize: '11px', color: 'var(--muted)', marginLeft: 'auto' }}>
-                    {new Date(art.created_at || art.date || Date.now()).toLocaleDateString(lang === 'UZ' ? 'uz-UZ' : lang === 'RU' ? 'ru-RU' : 'en-US', {
+                    {new Date(art.created_at || art.date || "2026-01-01").toLocaleDateString(lang === 'UZ' ? 'uz-UZ' : lang === 'RU' ? 'ru-RU' : 'en-US', {
                       year: 'numeric',
                       month: 'short',
                       day: 'numeric'
@@ -329,7 +237,7 @@ function SearchContent() {
                 </div>
 
                 <h3 style={{ fontFamily: '"Playfair Display", serif', fontSize: '1.25rem', color: 'var(--navy)', marginBottom: '8px', lineHeight: '1.4' }}>
-                  <Link href={`/article/${art.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                  <Link href={articlePath(art)} style={{ color: 'inherit', textDecoration: 'none' }}>
                     {art.title}
                   </Link>
                 </h3>
@@ -345,15 +253,15 @@ function SearchContent() {
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', borderTop: '1px solid var(--border)', paddingTop: '12px' }}>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <a href={getPdfUrl(art)} target="_blank" rel="noopener noreferrer" className="btn-pdf" style={{ textDecoration: 'none' }}>
+                    {isSupabaseConfigured && art.has_pdf ? <a href={getPdfUrl(art)} target="_blank" rel="noopener noreferrer" className="btn-pdf" style={{ textDecoration: 'none' }}>
                       <i className="ti ti-file-type-pdf" style={{ color: '#e53935' }}></i> PDF Yuklash
-                    </a>
-                    <Link href={`/article/${art.id}/certificate`} target="_blank" className="btn-pdf" style={{ textDecoration: 'none', color: '#b8902a' }}>
+                    </a> : <Link href={articlePath(art)} className="btn-pdf">Maqolani o‘qish ↗</Link>}
+                    {isSupabaseConfigured && art.kind !== 'thesis' && <Link href={`/article/${art.id}/certificate`} target="_blank" className="btn-pdf" style={{ textDecoration: 'none', color: '#b8902a' }}>
                       <i className="ti ti-certificate"></i> Sertifikat
-                    </Link>
+                    </Link>}
                   </div>
                   <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--muted)' }}>
-                    {art.doi || `DOI: 10.36001/tamaddun.2025.${art.volume}.${art.issue}.${art.id.slice(0, 5)}`}
+                    {art.doi ? `DOI: ${art.doi}` : `${articleYear(art)} · ${art.volume}-jild, ${art.issue}-son`}
                   </span>
                 </div>
               </div>

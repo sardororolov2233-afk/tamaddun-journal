@@ -1,0 +1,12 @@
+import PolicyPage from '../../components/PolicyPage';
+export const metadata = { title: 'Maxfiylik siyosati — Tamaddun' };
+export default function PrivacyPage() {
+  return <PolicyPage title="Maxfiylik siyosati" intro="Shaxsiy ma’lumotlar qanday olinishi, ishlatilishi va himoyalanishi haqida." sections={[
+    {title:'Yig‘iladigan ma’lumotlar',text:'Ro‘yxatdan o‘tish va material topshirishda ism-familiya, email, mualliflar, ilmiy ish matni, kalit so‘zlar, biriktirilgan fayllar va ixtiyoriy eslatmalar olinadi. Sayt tili va namuna rejimidagi yozuvlar brauzerning mahalliy xotirasida saqlanishi mumkin.'},
+    {title:'Foydalanish maqsadlari',text:'Ma’lumotlar hisobga kirish, muallif bilan bog‘lanish, ishni ko‘rib chiqish, nashrga tayyorlash, topshirilma holatini ko‘rsatish va murojaatlarni ko‘rib chiqish uchun ishlatiladi. Nashr etilgan maqolaning sarlavhasi, mualliflari, ilmiy mazmuni va nashr ma’lumotlari ochiq arxivda ko‘rinadi.'},
+    {title:'Xizmatlar va tashqi kanallar',text:'Jonli onlayn rejimda hisob va fayllarni saqlash uchun Supabase ishlatiladi. Email yoki Telegram orqali topshirilganda ma’lumotlar tegishli xizmatlarning qoidalari bo‘yicha uzatiladi. Sahifadagi tashqi resurslar o‘z texnik ma’lumotlarini olishi mumkin. Materiallarga keraksiz maxfiy yoki uchinchi shaxslarning shaxsiy ma’lumotlarini kiritmang.'},
+    {title:'Fayllarning ochiqligi',text:'Nashr etilgan ishlar ochiq foydalanish uchun mo‘ljallangan. Saytning joriy fayl saqlash tizimi ochiq havolalardan foydalanishi mumkin; shuning uchun saytga shaxsiy hujjatlar, bank karta ma’lumotlari yoki maxfiy materiallarni yuklamang. Hali nashr qilinmagan maxfiy qo‘lyozmalar bo‘yicha avval tahririyat bilan email orqali kelishing.'},
+    {title:'Saqlash va o‘chirish',text:'Ma’lumotlar topshirilmani ko‘rib chiqish va nashrni yuritish uchun zarur davr davomida saqlanadi. Nashr etilgan ilmiy arxiv uzoq muddatli ochiq saqlash uchun mo‘ljallangan. Shaxsiy ma’lumotni ko‘rish, tuzatish, hisobni o‘chirish yoki nashrdagi ma’lumot yuzasidan so‘rovni tahririyatga yuborish mumkin. Zarur huquqiy va ilmiy arxiv talablari murojaatni ko‘rib chiqishda tushuntiriladi.'},
+    {title:'Hisob va mahalliy xotira',text:'Hisob seansi va til tanlovi uchun brauzer xotirasidan foydalaniladi. Namuna rejimida kiritilgan yozuvlar faqat shu brauzerda qoladi va tahririyatga yuborilmaydi. Umumiy qurilmada ishlagach hisobdan chiqing va kerak bo‘lsa brauzerning sayt ma’lumotlarini tozalang.'},
+  ]} />;
+}

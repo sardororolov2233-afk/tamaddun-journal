@@ -34,3 +34,21 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Tamaddun issue archive
+
+Journal intake settings, contact details and APC prices live in
+`src/lib/journal.ts`. The archive lists issues by year, volume and issue number;
+editors select publication placement before approving articles or theses.
+
+**Existing Supabase deployments:** apply
+[`supabase/migrations/20261023_issue_archive.sql`](supabase/migrations/20261023_issue_archive.sql)
+before deploying this version. It adds required publication metadata and moves
+existing publications into volume 1, issues 1 and 2 (2026). See
+[archive setup and migration notes](supabase/ARCHIVE_SETUP.md).
+
+Without Supabase variables, on-site submissions remain browser-local demos.
+The `/submit` page provides email and Telegram alternatives for real submissions.
+The payment page has no simulated payment integration.
+
+Run archive logic checks with `node --test tests/journal-archive.test.cjs`.

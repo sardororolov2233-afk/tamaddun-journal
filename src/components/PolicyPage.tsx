@@ -1,0 +1,5 @@
+import Link from 'next/link';
+import { JOURNAL } from '../lib/journal';
+export default function PolicyPage({ title, intro, sections }: { title: string; intro: string; sections: { title: string; text: string }[] }) {
+  return <div className="journal-page policy-page"><div className="breadcrumbs"><Link href="/">Bosh sahifa</Link><span>/</span><span>{title}</span></div><div className="page-heading"><div><span className="section-kicker">TAMADDUN / 2026</span><h1>{title}</h1></div><p>{intro}</p></div><div className="policy-panel">{sections.map((section,index) => <section key={section.title}><h2>{index + 1}. {section.title}</h2><p>{section.text}</p></section>)}<section><h2>Aloqa va murojaatlar</h2><p>Tahririyat: <a href={JOURNAL.telegram} target="_blank" rel="noopener noreferrer">@sardorbekuralov</a> · <a href={`mailto:${JOURNAL.email}`}>{JOURNAL.email}</a>.</p></section><div className="policy-links"><Link href="/offer">Ommaviy oferta</Link><Link href="/privacy">Maxfiylik siyosati</Link><Link href="/security">Xavfsizlik qoidalari</Link></div></div></div>;
+}

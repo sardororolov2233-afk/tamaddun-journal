@@ -183,7 +183,7 @@ export default function LoginPage() {
 
         <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '13px' }}>
           <span style={{ color: 'var(--muted)' }}>{t.login.noAccount} </span>
-          <Link href="/register" style={{ color: 'var(--navy)', fontWeight: 600, textDecoration: 'none' }}>{t.login.signup}</Link>
+          <Link href="/register?next=/submit" style={{ color: 'var(--navy)', fontWeight: 600, textDecoration: 'none' }}>{t.login.signup}</Link>
         </div>
       </div>
     </div>

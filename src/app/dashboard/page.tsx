@@ -9,11 +9,14 @@ import UploadArticleForm from '../../components/UploadArticleForm';
 import UploadThesisForm from '../../components/UploadThesisForm';
 import UploadVolumeForm from '../../components/UploadVolumeForm';
 import { supabase } from '../../lib/supabaseClient';
+import PublicationFields, { CURRENT_TARGET, type PublicationTarget } from '../../components/PublicationFields';
+import { migrateLocalArchive } from '../../lib/journalRepository';
 
 export default function DashboardPage() {
   const { user, logout, isSupabaseConfigured } = useAuth();
   const { lang } = useLanguage();
   const router = useRouter();
+  const [publishTargets, setPublishTargets] = useState<Record<string, PublicationTarget>>({});
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [articles, setArticles] = useState<any[]>([]);
@@ -37,6 +40,7 @@ export default function DashboardPage() {
         setArticles(data);
       }
     } else {
+      migrateLocalArchive();
       const saved = localStorage.getItem('gjir_articles');
       if (saved) {
         setArticles(JSON.parse(saved));
@@ -56,6 +60,7 @@ export default function DashboardPage() {
         setTheses(data);
       }
     } else {
+      migrateLocalArchive();
       const saved = localStorage.getItem('gjir_theses');
       if (saved) {
         setTheses(JSON.parse(saved));
@@ -124,9 +129,10 @@ export default function DashboardPage() {
 
   // Publish Article Action
   const handlePublish = async (id: string) => {
+    const target = publishTargets[`article/${id}`] || CURRENT_TARGET;
     if (isSupabaseConfigured) {
       const { supabase } = await import('../../lib/supabaseClient');
-      const { error } = await supabase.from('articles').update({ status: 'published' }).eq('id', id);
+      const { error } = await supabase.from('articles').update({ status: 'published', ...target }).eq('id', id);
       if (error) {
         alert("Xatolik: " + error.message);
         return;
@@ -134,7 +140,7 @@ export default function DashboardPage() {
       fetchArticles();
       alert("Maqola muvaffaqiyatli chop etildi!");
     } else {
-      const updated = articles.map(a => a.id === id ? { ...a, status: 'published' } : a);
+      const updated = articles.map(a => a.id === id ? { ...a, status: 'published', ...target } : a);
       setArticles(updated);
       localStorage.setItem('gjir_articles', JSON.stringify(updated));
       alert("Maqola muvaffaqiyatli chop etildi!");
@@ -257,9 +263,10 @@ export default function DashboardPage() {
 
   // Publish Thesis Action
   const handlePublishThesis = async (id: string) => {
+    const target = publishTargets[`thesis/${id}`] || CURRENT_TARGET;
     if (isSupabaseConfigured) {
       const { supabase } = await import('../../lib/supabaseClient');
-      const { error } = await supabase.from('theses').update({ status: 'published' }).eq('id', id);
+      const { error } = await supabase.from('theses').update({ status: 'published', ...target }).eq('id', id);
       if (error) {
         alert("Xatolik: " + error.message);
         return;
@@ -267,7 +274,7 @@ export default function DashboardPage() {
       fetchTheses();
       alert("Tezis muvaffaqiyatli chop etildi!");
     } else {
-      const updated = theses.map(t => t.id === id ? { ...t, status: 'published' } : t);
+      const updated = theses.map(t => t.id === id ? { ...t, status: 'published', ...target } : t);
       setTheses(updated);
       localStorage.setItem('gjir_theses', JSON.stringify(updated));
       alert("Tezis muvaffaqiyatli chop etildi!");
@@ -826,6 +833,7 @@ export default function DashboardPage() {
                         <button onClick={() => handleReject(article.id)} style={{ background: '#e53935', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}>
                           <i className="ti ti-x"></i> {lang === 'UZ' ? 'Rad etish' : 'Отклонить'}
                         </button>
+                        <PublicationFields value={publishTargets[`article/${article.id}`] || CURRENT_TARGET} onChange={value => setPublishTargets(prev => ({...prev,[`article/${article.id}`]:value}))} />
                         <button onClick={() => handlePublish(article.id)} style={{ background: '#4CAF50', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}>
                           <i className="ti ti-check"></i> {lang === 'UZ' ? 'Chop etish' : 'Опубликовать'}
                         </button>
@@ -1067,6 +1075,7 @@ export default function DashboardPage() {
                         <button onClick={() => handleRejectThesis(thesis.id)} style={{ background: '#e53935', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', fontSize: '12px' }}>
                           {lang === 'UZ' ? 'Rad etish' : 'Отклонить'}
                         </button>
+                        <PublicationFields value={publishTargets[`thesis/${thesis.id}`] || CURRENT_TARGET} onChange={value => setPublishTargets(prev => ({...prev,[`thesis/${thesis.id}`]:value}))} />
                         <button onClick={() => handlePublishThesis(thesis.id)} style={{ background: '#4CAF50', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', fontSize: '12px' }}>
                           {lang === 'UZ' ? 'Chop etish' : 'Опубликовать'}
                         </button>

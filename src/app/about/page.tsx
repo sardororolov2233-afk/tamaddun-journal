@@ -33,12 +33,12 @@ export default function AboutPage() {
       frequency: "Davriylik",
       frequencyVal: "Har 2 oyda bir marta (Yiliga 6 ta son)",
       peerReview: "Taqriz Jarayoni",
-      peerReviewVal: "Ikki tomonlama yashirin (Double-blind peer review), 2-4 hafta davomida",
+      peerReviewVal: "Ikki tomonlama yashirin (Double-blind peer review), dastlabki ko‘rib chiqish 24–48 soat ichida",
       plagiarism: "Plagiat Siyosati",
       plagiarismVal: "Barcha maqolalar Plagiarism detector va Turnitin dasturlarida tekshiriladi (ruxsat etilgan max. ulush 15%)",
       
       ctaTitle: "O'z tadqiqotingizni nashr qiling",
-      ctaDesc: "Biz yuqori sifatli va dolzarb mavzulardagi ilmiy ishlar qabulini davom ettirmoqdamiz.",
+      ctaDesc: "Jurnal 2026-yildan faoliyat yuritadi. Hozir 1-jild, 3-son uchun qabul davom etmoqda.",
       ctaBtn: "Maqola Yuklash"
     },
     RU: {
@@ -66,7 +66,7 @@ export default function AboutPage() {
       frequency: "Периодичность",
       frequencyVal: "Раз в 2 месяца (6 выпусков в год)",
       peerReview: "Рецензирование",
-      peerReviewVal: "Двойное слепое рецензирование (Double-blind peer review), в течение 2-4 недель",
+      peerReviewVal: "Двойное слепое рецензирование (Double-blind peer review), первичное рассмотрение в течение 24–48 часов",
       plagiarism: "Плагиат",
       plagiarismVal: "Все статьи проходят проверку на антиплагиат через специализированные системы (допустимый лимит оригинальности от 85%)",
       
@@ -99,7 +99,7 @@ export default function AboutPage() {
       frequency: "Frequency",
       frequencyVal: "Bimonthly (6 issues per year)",
       peerReview: "Peer Review",
-      peerReviewVal: "Double-blind peer review within 2-4 weeks",
+      peerReviewVal: "Double-blind peer review initial review within 24–48 hours",
       plagiarism: "Plagiarism Policy",
       plagiarismVal: "All articles are checked with anti-plagiarism tools like Turnitin (minimum originality required: 85%)",
       
@@ -203,7 +203,7 @@ export default function AboutPage() {
           <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '15px', marginBottom: '2rem', maxWidth: '600px', margin: '0 auto 2rem' }}>
             {t.ctaDesc}
           </p>
-          <Link href="/login" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
+          <Link href="/submit" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
             {t.ctaBtn} <i className="ti ti-upload"></i>
           </Link>
         </div>
