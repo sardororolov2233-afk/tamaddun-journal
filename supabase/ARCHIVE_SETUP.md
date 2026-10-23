@@ -25,8 +25,8 @@ positive issue number. Empty pending issues are not shown as published.
 Without Supabase configuration, sample articles appear only in demo mode, divided
 across issues 1 and 2. Existing local published records undergo a one-time
 migration using `tamaddun_archive_2026_v1`; future local records keep their issue.
-Demo file uploads are NOT sent to the editorial office. Use the email/Telegram
-links for real submissions until Supabase auth, database and storage are connected.
+On-site submissions require a real Supabase-authenticated account. Use the email/Telegram
+links until Supabase auth, database and storage are connected. Browser-local demo login is disabled.
 
 Payment integration is not configured. APC pages show real prices and contact
 instructions; no simulated successful payment or receipt is presented.

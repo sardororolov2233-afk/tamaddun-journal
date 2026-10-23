@@ -47,8 +47,16 @@ before deploying this version. It adds required publication metadata and moves
 existing publications into volume 1, issues 1 and 2 (2026). See
 [archive setup and migration notes](supabase/ARCHIVE_SETUP.md).
 
-Without Supabase variables, on-site submissions remain browser-local demos.
+Without Supabase variables, on-site account creation and submission are unavailable; the public archive can still show sample records.
 The `/submit` page provides email and Telegram alternatives for real submissions.
 The payment page has no simulated payment integration.
 
 Run archive logic checks with `node --test tests/journal-archive.test.cjs`.
+
+## Account payments and receipts
+
+Before deploying the payment workflow, apply
+[`20261024_payments.sql`](supabase/migrations/20261024_payments.sql) after the archive
+migration. See [payment setup](supabase/PAYMENT_SETUP.md) for Auth settings, private
+receipt storage, admin review and deletion. Site submissions now require a real
+Supabase-authenticated account; browser-local demo login is disabled.

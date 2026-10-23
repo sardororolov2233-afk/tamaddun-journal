@@ -11,9 +11,12 @@ import UploadVolumeForm from '../../components/UploadVolumeForm';
 import { supabase } from '../../lib/supabaseClient';
 import PublicationFields, { CURRENT_TARGET, type PublicationTarget } from '../../components/PublicationFields';
 import { migrateLocalArchive } from '../../lib/journalRepository';
+import usePayments from '../../components/usePayments';
+import PaymentNotice from '../../components/PaymentNotice';
 
 export default function DashboardPage() {
-  const { user, logout, isSupabaseConfigured } = useAuth();
+  const { user, ready, logout, isSupabaseConfigured } = useAuth();
+  const {payments, error:paymentError, refresh:refreshPayments} = usePayments();
   const { lang } = useLanguage();
   const router = useRouter();
   const [publishTargets, setPublishTargets] = useState<Record<string, PublicationTarget>>({});
@@ -113,7 +116,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     setMounted(true);
-    if (!user && mounted) {
+    if (!user && ready && mounted) {
       router.push('/login');
     }
     if (user) {
@@ -125,27 +128,17 @@ export default function DashboardPage() {
         fetchUsers();
       }
     }
-  }, [user, router, mounted, isSupabaseConfigured]);
+  }, [user, ready, router, mounted, isSupabaseConfigured]);
 
-  // Publish Article Action
-  const handlePublish = async (id: string) => {
-    const target = publishTargets[`article/${id}`] || CURRENT_TARGET;
-    if (isSupabaseConfigured) {
-      const { supabase } = await import('../../lib/supabaseClient');
-      const { error } = await supabase.from('articles').update({ status: 'published', ...target }).eq('id', id);
-      if (error) {
-        alert("Xatolik: " + error.message);
-        return;
-      }
-      fetchArticles();
-      alert("Maqola muvaffaqiyatli chop etildi!");
-    } else {
-      const updated = articles.map(a => a.id === id ? { ...a, status: 'published', ...target } : a);
-      setArticles(updated);
-      localStorage.setItem('gjir_articles', JSON.stringify(updated));
-      alert("Maqola muvaffaqiyatli chop etildi!");
-    }
+  const requestPayment = async (kind:'article'|'thesis', id:string) => {
+    if(user?.role !== 'admin')return;
+    const target = publishTargets[`${kind}/${id}`] || CURRENT_TARGET;
+    const {error} = await supabase.rpc('journal_request_payment',{p_kind:kind,p_submission:id,p_year:target.publication_year,p_volume:target.volume,p_issue:target.issue});
+    if(error){alert(error.message);return;}
+    await refreshPayments();
+    alert('Material nashrga ma’qullandi. Muallif akkauntiga to‘lov eslatmasi yuborildi. Chek tasdiqlangach nashr etiladi.');
   };
+  const handlePublish = (id:string) => requestPayment('article',id);
 
   // Reject Article Action (Requested by User)
   const handleReject = async (id: string) => {
@@ -169,26 +162,14 @@ export default function DashboardPage() {
     }
   };
 
-  // Delete Article Action (Requested by User)
-  const handleDeleteArticle = async (id: string) => {
-    if (!window.confirm(lang === 'UZ' ? "Rostdan ham ushbu maqolani o'chirib tashlamoqchimisiz? Ushbu amal qaytarilmaydi!" : "Вы действительно хотите удалить эту статью? Это действие необратимо!")) return;
-
-    if (isSupabaseConfigured) {
-      const { supabase } = await import('../../lib/supabaseClient');
-      const { error } = await supabase.from('articles').delete().eq('id', id);
-      if (error) {
-        alert("Xatolik: " + error.message);
-        return;
-      }
-      fetchArticles();
-      alert("Maqola o'chirib tashlandi!");
-    } else {
-      const updated = articles.filter(a => a.id !== id);
-      setArticles(updated);
-      localStorage.setItem('gjir_articles', JSON.stringify(updated));
-      alert("Maqola o'chirib tashlandi!");
-    }
+  const deleteSubmission = async (kind:'article'|'thesis',id:string) => {
+    if(user?.role !== 'admin' || !window.confirm('Ushbu materialni o‘chirasizmi? U saytdan olib tashlanadi. To‘lov tarixi saqlanadi.'))return;
+    const {error} = await supabase.rpc('journal_delete_submission',{p_kind:kind,p_submission:id});
+    if(error){alert(error.message);return;}
+    await Promise.all([fetchArticles(),fetchTheses(),refreshPayments()]);
+    alert('Material o‘chirildi.');
   };
+  const handleDeleteArticle = (id:string) => deleteSubmission('article',id);
 
   // Save Reviewer Notes Action
   const handleSaveReview = async (id: string) => {
@@ -261,25 +242,7 @@ export default function DashboardPage() {
     }
   };
 
-  // Publish Thesis Action
-  const handlePublishThesis = async (id: string) => {
-    const target = publishTargets[`thesis/${id}`] || CURRENT_TARGET;
-    if (isSupabaseConfigured) {
-      const { supabase } = await import('../../lib/supabaseClient');
-      const { error } = await supabase.from('theses').update({ status: 'published', ...target }).eq('id', id);
-      if (error) {
-        alert("Xatolik: " + error.message);
-        return;
-      }
-      fetchTheses();
-      alert("Tezis muvaffaqiyatli chop etildi!");
-    } else {
-      const updated = theses.map(t => t.id === id ? { ...t, status: 'published', ...target } : t);
-      setTheses(updated);
-      localStorage.setItem('gjir_theses', JSON.stringify(updated));
-      alert("Tezis muvaffaqiyatli chop etildi!");
-    }
-  };
+  const handlePublishThesis = (id:string) => requestPayment('thesis',id);
 
   // Reject Thesis Action
   const handleRejectThesis = async (id: string) => {
@@ -303,26 +266,7 @@ export default function DashboardPage() {
     }
   };
 
-  // Delete Thesis Action
-  const handleDeleteThesis = async (id: string) => {
-    if (!window.confirm(lang === 'UZ' ? "Rostdan ham ushbu tezisni o'chirib tashlamoqchimisiz?" : "Удалить этот тезис?")) return;
-
-    if (isSupabaseConfigured) {
-      const { supabase } = await import('../../lib/supabaseClient');
-      const { error } = await supabase.from('theses').delete().eq('id', id);
-      if (error) {
-        alert("Xatolik: " + error.message);
-        return;
-      }
-      fetchTheses();
-      alert("Tezis o'chirib tashlandi!");
-    } else {
-      const updated = theses.filter(t => t.id !== id);
-      setTheses(updated);
-      localStorage.setItem('gjir_theses', JSON.stringify(updated));
-      alert("Tezis o'chirib tashlandi!");
-    }
-  };
+  const handleDeleteThesis = (id:string) => deleteSubmission('thesis',id);
 
   // Save Reviewer Notes for Thesis
   const handleSaveReviewThesis = async (id: string) => {
@@ -410,10 +354,18 @@ export default function DashboardPage() {
     }
   };
 
+  useEffect(()=>{
+    if(!user)return;
+    const refresh=()=>{fetchArticles();fetchTheses();};
+    window.addEventListener('focus',refresh);
+    window.addEventListener('journal:payments-updated',refresh);
+    return ()=>{window.removeEventListener('focus',refresh);window.removeEventListener('journal:payments-updated',refresh);};
+  },[user,isSupabaseConfigured]);
+
   if (!mounted || !user) return null;
 
   // Filtered listings
-  const pendingArticles = articles.filter(a => a.status === 'pending');
+  const pendingArticles = articles.filter(a => a.status === 'pending' && !payments.some(p=>p.kind==='article' && p.submission_id===a.id));
   const publishedArticles = articles.filter(a => a.status === 'published');
   const rejectedArticles = articles.filter(a => a.status === 'rejected');
 
@@ -422,7 +374,7 @@ export default function DashboardPage() {
     return a.authorEmail === user.email;
   });
 
-  const pendingTheses = theses.filter(t => t.status === 'pending');
+  const pendingTheses = theses.filter(t => t.status === 'pending' && !payments.some(p=>p.kind==='thesis' && p.submission_id===t.id));
   const publishedTheses = theses.filter(t => t.status === 'published');
   const rejectedTheses = theses.filter(t => t.status === 'rejected');
 
@@ -456,7 +408,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="dashboard-layout animate-fade-in-up" style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1rem', display: 'grid', gridTemplateColumns: '280px 1fr', gap: '2.5rem', minHeight: 'calc(100vh - 200px)' }}>
+    <><div className="dashboard-payment-header"><PaymentNotice payments={payments} />{paymentError && <p role="alert" className="error-notice">{paymentError}</p>}</div><div className="dashboard-layout animate-fade-in-up" style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1rem', display: 'grid', gridTemplateColumns: '280px 1fr', gap: '2.5rem', minHeight: 'calc(100vh - 200px)' }}>
       
       {/* Dashboard Sidebar */}
       <div className="dashboard-sidebar">
@@ -545,6 +497,8 @@ export default function DashboardPage() {
             {/* Admin specific actions */}
             {user.role === 'admin' && (
               <>
+                <button className="payment-button" onClick={()=>setActiveTab('admin-all')}>Barcha materiallar · o‘chirish</button>
+                <Link className="payment-button" href="/payments">To‘lovlar va cheklar</Link>
                 <button 
                   onClick={() => setActiveTab('admin-users')}
                   style={{ textAlign: 'left', padding: '10px 14px', background: activeTab === 'admin-users' ? 'var(--cream2)' : 'transparent', color: 'var(--navy)', border: 'none', borderRadius: '4px', fontWeight: activeTab === 'admin-users' ? 700 : 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13.5px', transition: 'var(--transition)' }}>
@@ -634,6 +588,8 @@ export default function DashboardPage() {
             setActiveTab('my-articles');
           }} />
         )}
+
+        {activeTab === 'admin-all' && user.role === 'admin' && <section><h2>Barcha materiallar</h2><p className="receipt-help">Kutilayotgan, ma’qullangan, nashr etilgan va rad etilgan materiallarni boshqarish.</p>{[...articles.map(a=>({...a,kind:'article' as const})),...theses.map(a=>({...a,kind:'thesis' as const}))].map(material=><article className="payment-card" key={`${material.kind}/${material.id}`}><h3>{material.title}</h3><p>{material.kind==='article'?'Maqola':'Tezis'} · {material.status==='published'?'Nashr etilgan':material.status==='rejected'?'Rad etilgan':'Ko‘rib chiqilmoqda'}</p><div className="payment-controls"><button className="payment-button payment-danger" onClick={()=>deleteSubmission(material.kind,material.id)}>Materialni o‘chirish</button></div></article>)}</section>}
 
         {/* AUTHOR ARTICLES LIST TAB */}
         {activeTab === 'my-articles' && user.role === 'author' && (
@@ -830,12 +786,13 @@ export default function DashboardPage() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', flexWrap: 'wrap', gap: '12px' }}>
                       <h3 style={{ fontSize: '1.25rem', color: 'var(--navy)', fontWeight: 700, margin: 0, maxWidth: '65%' }}>{article.title}</h3>
                       <div style={{ display: 'flex', gap: '8px' }}>
+                        <button className="payment-button payment-danger" onClick={() => handleDeleteArticle(article.id)}>O‘chirish</button>
                         <button onClick={() => handleReject(article.id)} style={{ background: '#e53935', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}>
                           <i className="ti ti-x"></i> {lang === 'UZ' ? 'Rad etish' : 'Отклонить'}
                         </button>
                         <PublicationFields value={publishTargets[`article/${article.id}`] || CURRENT_TARGET} onChange={value => setPublishTargets(prev => ({...prev,[`article/${article.id}`]:value}))} />
                         <button onClick={() => handlePublish(article.id)} style={{ background: '#4CAF50', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}>
-                          <i className="ti ti-check"></i> {lang === 'UZ' ? 'Chop etish' : 'Опубликовать'}
+                          <i className="ti ti-check"></i> {lang === 'UZ' ? 'Ma’qullash va to‘lov so‘rash' : 'Одобрить и запросить оплату'}
                         </button>
                       </div>
                     </div>
@@ -1072,12 +1029,13 @@ export default function DashboardPage() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', flexWrap: 'wrap', gap: '12px' }}>
                       <h4 style={{ fontSize: '1.15rem', color: 'var(--navy)', fontWeight: 700, margin: 0, maxWidth: '65%' }}>{thesis.title}</h4>
                       <div style={{ display: 'flex', gap: '8px' }}>
+                        <button className="payment-button payment-danger" onClick={() => handleDeleteThesis(thesis.id)}>O‘chirish</button>
                         <button onClick={() => handleRejectThesis(thesis.id)} style={{ background: '#e53935', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', fontSize: '12px' }}>
                           {lang === 'UZ' ? 'Rad etish' : 'Отклонить'}
                         </button>
                         <PublicationFields value={publishTargets[`thesis/${thesis.id}`] || CURRENT_TARGET} onChange={value => setPublishTargets(prev => ({...prev,[`thesis/${thesis.id}`]:value}))} />
                         <button onClick={() => handlePublishThesis(thesis.id)} style={{ background: '#4CAF50', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', fontSize: '12px' }}>
-                          {lang === 'UZ' ? 'Chop etish' : 'Опубликовать'}
+                          {lang === 'UZ' ? 'Ma’qullash va to‘lov so‘rash' : 'Одобрить и запросить оплату'}
                         </button>
                       </div>
                     </div>
@@ -1308,6 +1266,6 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
-    </div>
+    </div></>
   );
 }

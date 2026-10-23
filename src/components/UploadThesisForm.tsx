@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Link from 'next/link';
 import { JOURNAL } from '../lib/journal';
-import { migrateLocalArchive } from '../lib/journalRepository';
 
 export default function UploadThesisForm({ onSuccess }: { onSuccess?: () => void }) {
   const { user, isSupabaseConfigured } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [consent, setConsent] = useState(false);
+  const [field,setField] = useState('Pedagogika');
   const [title, setTitle] = useState('');
   const [keywords, setKeywords] = useState('');
   const [abstract, setAbstract] = useState('');
@@ -35,6 +35,7 @@ export default function UploadThesisForm({ onSuccess }: { onSuccess?: () => void
 
   const handleInitialSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user || !isSupabaseConfigured) { setErrorMsg('Material topshirish uchun ro‘yxatdan o‘ting va akkauntingizga kiring.'); return; }
     if (!consent) { setErrorMsg('Topshirish shartlariga rozilik bildiring.'); return; }
     if (!docxFile || !pdfFile) {
       setErrorMsg("Ikkala faylni ham (DOCX va PDF) yuklashingiz shart!");
@@ -51,13 +52,17 @@ export default function UploadThesisForm({ onSuccess }: { onSuccess?: () => void
 
   const handleFinalSubmit = async () => {
     if (submitting) return;
-    if (!user) { setErrorMsg('Avval hisobingizga kiring.'); setIsPreviewOpen(false); return; }
+    if (!user || !isSupabaseConfigured) { setErrorMsg('Avval hisobingizga kiring.'); setIsPreviewOpen(false); return; }
     setSubmitting(true);
     try {
+    const {supabase:authenticatedClient} = await import('../lib/supabaseClient');
+    const {data:{user:authenticatedUser},error:sessionError} = await authenticatedClient.auth.getUser();
+    if(sessionError || authenticatedUser?.id !== user.id)throw new Error('Akkauntingizga qayta kiring.');
     const thesisId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
     const newThesis = {
       id: thesisId,
       title,
+      field,
       keywords,
       abstract,
       authors: authors.filter(a => a.trim() !== ''),
@@ -100,17 +105,10 @@ export default function UploadThesisForm({ onSuccess }: { onSuccess?: () => void
         alert("Xatolik yuz berdi: " + error.message);
         return;
       }
-    } else {
-      migrateLocalArchive();
-      // Save to local storage to mock backend
-      const fallbackThesis = { ...newThesis, authorEmail: user?.email, id: Date.now().toString(), date: new Date().toISOString() };
-      const existingStr = localStorage.getItem('gjir_theses');
-      const existing = existingStr ? JSON.parse(existingStr) : [];
-      localStorage.setItem('gjir_theses', JSON.stringify([fallbackThesis, ...existing]));
     }
 
     setIsPreviewOpen(false);
-    alert(isSupabaseConfigured ? "Materialingiz yuborildi. 24–48 soat ichida ko‘rib chiqiladi." : "Namuna yozuv shu brauzerda saqlandi. Haqiqiy materialni email yoki Telegram orqali yuboring.");
+    alert("Materialingiz yuborildi. Admin ma’qullagach akkauntingizda to‘lov eslatmasi chiqadi.");
 
     // Reset form
     setTitle('');
@@ -168,6 +166,9 @@ export default function UploadThesisForm({ onSuccess }: { onSuccess?: () => void
 
         <p className="submission-info">2026 · 1-jild, 3-son · 24–48 soat ichida ko‘rib chiqish. Maqola: 120 000 so‘m; tezis: 80 000 so‘m.</p>
         <form onSubmit={handleInitialSubmit}>
+          <label htmlFor="submission-field" style={labelStyle}>Ilmiy yo‘nalish</label>
+          <select id="submission-field" value={field} onChange={e=>setField(e.target.value)} style={inputStyle}>{['Pedagogika','Filologiya','Tarix','Biotibbiyot','Informatika','Iqtisodiyot','Kimyo','Matematika','Boshqa'].map(name=><option key={name}>{name}</option>)}</select>
+          <p className="receipt-help">Admin ma’qullagach akkauntingizda to‘lov eslatmasi chiqadi. Chek tasdiqlanmaguncha material nashr qilinmaydi.</p>
           <div style={{ marginBottom: '1.5rem' }}>
             <label style={labelStyle}>Tezis mavzusi nomi *</label>
             <input type="text" required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Masalan: Sun'iy intellektning ta'limdagi o'rni..." style={inputStyle} />
