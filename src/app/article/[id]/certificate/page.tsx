@@ -550,7 +550,7 @@ export default function CertificatePage() {
 
                 {/* {{jild}}, {{nashr}}, {{yil}} */}
                 <div style={{ position: 'absolute', top: '67%', left: '50%', transform: 'translate(-50%, -50%)', width: '80%', textAlign: 'center', fontSize: '0.85rem', fontWeight: 600, color: '#0d1d33', fontFamily: 'sans-serif' }}>
-                  «Tamaddun» jurnali · Jild {article.volume}, Nashr {article.issue} ({pubYear})
+                  «Tamaddun» konferensiyasi · Jild {article.volume}, Nashr {article.issue} ({pubYear})
                 </div>
 
                 {/* {{sana}} */}
@@ -591,8 +591,8 @@ export default function CertificatePage() {
                 <div className="cert-header">
                   <div className="cert-logo">T</div>
                   <div className="cert-journal-name">Tamaddun</div>
-                  <div className="cert-journal-subtitle">Ilmiy tadbirkorlik va innovatsiyalar jurnali</div>
-                  <div className="cert-issn">ISSN (online): 2949-XXXX · jurnal-tamaddun.uz</div>
+                  <div className="cert-journal-subtitle">Respublika ilmiy-amaliy konferensiyasi</div>
+                  <div className="cert-issn">Elektron materiallar to‘plami · oyiga ikki marta</div>
                 </div>
 
                 {/* Certificate Title */}
@@ -622,9 +622,9 @@ export default function CertificatePage() {
                   </div>
 
                   <div className="cert-pub-details">
-                    <div>«Tamaddun» ilmiy jurnalining Jild {article.volume}, Nashr {article.issue} ({pubYear}) sonida chop etildi.</div>
+                    <div>«Tamaddun» ilmiy konferensiyasining Jild {article.volume}, Nashr {article.issue} ({pubYear}) sonida chop etildi.</div>
                     <div style={{ color: '#b8902a', fontWeight: 500, fontSize: '0.72rem' }}>
-                      Published in the Tamaddun Scientific Journal, Volume {article.volume}, Issue {article.issue} ({pubYear}).
+                      Published in the Tamaddun Scientific Conference, Volume {article.volume}, Issue {article.issue} ({pubYear}).
                     </div>
                   </div>
                 </div>
@@ -717,10 +717,10 @@ export default function CertificatePage() {
                           <circle cx="50" cy="50" r="33.5" fill="none" stroke="#1d308f" strokeWidth="0.8" strokeDasharray="2 1.5" />
                           <circle cx="50" cy="50" r="31.8" fill="none" stroke="#1d308f" strokeWidth="0.6" />
 
-                          {/* Top Text: TAMADDUN JURNALI */}
+                          {/* Top Text: TAMADDUN KONFERENSIYASI */}
                           <text fontSize="4.5" fontWeight="800" fill="#1d308f" letterSpacing="0.8" fontFamily="system-ui, -apple-system, sans-serif">
                             <textPath href="#seal-text-top" startOffset="50%" textAnchor="middle">
-                              TAMADDUN JURNALI
+                              TAMADDUN KONFERENSIYASI
                             </textPath>
                           </text>
 

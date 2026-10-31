@@ -11,7 +11,7 @@ export default function GuidelinesPage() {
     UZ: {
       title: "Mualliflar uchun yo'riqnoma",
       subtitle: "Maqolani rasmiylashtirish va taqdim etish talablari",
-      intro: "Jurnalga taqdim etiladigan barcha ilmiy maqolalar quyidagi talablarga muvofiq tayyorlangan bo'lishi lozim. Talablarga javob bermaydigan maqolalar ko'rib chiqilmasdan rad etilishi mumkin.",
+      intro: "Konferensiyaga taqdim etiladigan barcha ilmiy maqolalar quyidagi talablarga muvofiq tayyorlangan bo'lishi lozim. Talablarga javob bermaydigan maqolalar ko'rib chiqilmasdan rad etilishi mumkin.",
       
       section1Title: "1. Maqola tuzilishi (Structure)",
       section1Desc: "Maqola matni mantiqiy ketma-ketlikda va quyidagi majburiy qismlardan iborat bo'lishi kerak:",
@@ -34,7 +34,7 @@ export default function GuidelinesPage() {
         "Hoshiyalar (Margins): yuqoridan va pastdan — 2 sm, chapdan — 3 sm, o'ngdan — 1.5 sm.",
         "Rasmlar va jadvallar: Maqola ichida raqamlangan va aniq sarlavhaga ega bo'lishi lozim.",
         "Maqola hajmi: 6 betdan 15 betgacha bo'lishi tavsiya etiladi.",
-        "PDF variant: Har bir sahifaning yuqori (header) va pastki (footer) qismida «Tamaddun» ilmiy jurnali nomi va maxsus hoshiyalari (lines) qo'yilishi shart."
+        "PDF variant: Har bir sahifaning yuqori (header) va pastki (footer) qismida «Tamaddun» ilmiy konferensiyasi nomi va maxsus hoshiyalari (lines) qo'yilishi shart."
       ],
 
       section3Title: "3. Nashr etish jarayoni",
@@ -45,19 +45,19 @@ export default function GuidelinesPage() {
       step3: "Tahrirlash",
       step3Desc: "Muallif taqrizchilar mulohazalari asosida maqolani to'g'rilaydi.",
       step4: "Chop etish",
-      step4Desc: "Maqolaga DOI raqami beriladi va jurnal arxiviga joylashtiriladi.",
+      step4Desc: "Maqolaga DOI raqami beriladi va konferensiya arxiviga joylashtiriladi.",
 
       templateTitle: "Maqola Shablonini Yuklab Olish",
       templateDesc: "Tayyorlash jarayonini osonlashtirish uchun bizning rasmiy MS Word shablonimizdan foydalaning.",
       templateBtn: "Shablonni yuklab olish (.docx)",
       
       apcTitle: "APC (Article Processing Charge)",
-      apcDesc: "Jurnal ochiq kirish litsenziyasi ostida ishlagani sababli, maqolani tahrirlash, DOI berish va texnik ko'rik uchun to'lov (APC) undiriladi. Batafsil ma'lumot shaxsiy kabinetda ko'rsatiladi."
+      apcDesc: "Konferensiya ochiq kirish litsenziyasi ostida ishlagani sababli, maqolani tahrirlash, DOI berish va texnik ko'rik uchun to'lov (APC) undiriladi. Batafsil ma'lumot shaxsiy kabinetda ko'rsatiladi."
     },
     RU: {
       title: "Руководство для авторов",
       subtitle: "Требования к оформлению и отправке научных статей",
-      intro: "Все научные статьи, представляемые в журнал, должны быть оформлены в соответствии со следующими требованиями. Статьи, не соответствующие правилам, могут быть отклонены без рассмотрения.",
+      intro: "Все научные статьи, представляемые в конференция, должны быть оформлены в соответствии со следующими требованиями. Статьи, не соответствующие правилам, могут быть отклонены без рассмотрения.",
       
       section1Title: "1. Структура статьи (Structure)",
       section1Desc: "Текст статьи должен быть логически последовательным и содержать следующие обязательные разделы:",
@@ -80,7 +80,7 @@ export default function GuidelinesPage() {
         "Поля (Margins): сверху и снизу — 2 см, слева — 3 см, справа — 1.5 см.",
         "Рисунки и таблицы: Должны быть пронумерованы внутри статьи и иметь четкие заголовки.",
         "Объем статьи: Рекомендуемый объем от 6 до 15 страниц.",
-        "Вариант PDF: В верхней (header) и нижней (footer) частях каждой страницы должны быть указаны название научного журнала «Tamaddun» и его рамки."
+        "Вариант PDF: В верхней (header) и нижней (footer) частях каждой страницы должны быть указаны название научно-практической конференции «Tamaddun» и его рамки."
       ],
 
       section3Title: "3. Процесс публикации",
@@ -91,19 +91,19 @@ export default function GuidelinesPage() {
       step3: "Доработка",
       step3Desc: "Автор исправляет статью на основе комментариев рецензентов.",
       step4: "Публикация",
-      step4Desc: "Статье присваивается DOI, и она публикуется в архиве журнала.",
+      step4Desc: "Статье присваивается DOI, и она публикуется в архиве конференции.",
 
       templateTitle: "Скачать шаблон статьи",
       templateDesc: "Используйте наш официальный шаблон MS Word, чтобы упростить процесс форматирования.",
       templateBtn: "Скачать шаблон (.docx)",
       
       apcTitle: "APC (Редакционный сбор)",
-      apcDesc: "Поскольку журнал работает по модели открытого доступа, за редактирование, присвоение DOI и техническую обработку взимается издательский сбор (APC). Детали доступны в личном кабинете."
+      apcDesc: "Поскольку конференция работает по модели открытого доступа, за редактирование, присвоение DOI и техническую обработку взимается издательский сбор (APC). Детали доступны в личном кабинете."
     },
     ENG: {
       title: "Author Guidelines",
       subtitle: "Manuscript Preparation and Submission Guidelines",
-      intro: "All manuscripts submitted to the journal must be formatted in accordance with the guidelines below. Submissions failing to meet these rules may be rejected without peer review.",
+      intro: "All manuscripts submitted to the conference must be formatted in accordance with the guidelines below. Submissions failing to meet these rules may be rejected without peer review.",
       
       section1Title: "1. Manuscript Structure",
       section1Desc: "The text of the paper should be logically structured and contain the following mandatory sections:",
@@ -126,7 +126,7 @@ export default function GuidelinesPage() {
         "Margins: top and bottom — 2 cm, left — 3 cm, right — 1.5 cm.",
         "Figures and Tables: Must be embedded inline, numbered chronologically, and have clear captions.",
         "Paper length: Recommended length is 6 to 15 pages.",
-        "PDF variant: The top (header) and bottom (footer) margins of each page must contain the 'Tamaddun' journal name and its borders/lines."
+        "PDF variant: The top (header) and bottom (footer) margins of each page must contain the 'Tamaddun' conference name and its borders/lines."
       ],
 
       section3Title: "3. Publication Process",
@@ -144,7 +144,7 @@ export default function GuidelinesPage() {
       templateBtn: "Download Template (.docx)",
       
       apcTitle: "APC (Article Processing Charge)",
-      apcDesc: "Since the journal operates under an open-access model, an Article Processing Charge (APC) is required to cover editing, DOI registration, and indexing costs. Details are shown in the author dashboard."
+      apcDesc: "Since the conference operates under an open-access model, an Article Processing Charge (APC) is required to cover editing, DOI registration, and indexing costs. Details are shown in the author dashboard."
     }
   };
 

@@ -18,7 +18,7 @@ export const dictionaries = {
       badge: "Open Access · CC BY 4.0",
       title1: "Ilm-fan chegarasiz, ",
       title2: "bilim erkin.",
-      desc: "Tamaddun — ko'p tarmoqli, ochiq kirish ilmiy jurnali. Barcha soha mutaxassislariga mahsulotli va sifatli ilmiy nashr imkonini yaratamiz.",
+      desc: "Tamaddun — Respublika ilmiy-amaliy konferensiyasi. Materiallar to‘plami oyiga ikki marta elektron shaklda, ochiq kirishda chop etiladi.",
       btnPrimary: "Maqola Yuklash ↗",
       btnOutline: "Arxivni Ko'rish"
     },
@@ -58,8 +58,8 @@ export const dictionaries = {
       inProgress: "(jarayonda)"
     },
     footer: {
-      desc: "Tamaddun ko'p tarmoqli, ochiq kirish ilmiy jurnal bo'lib, 2026 yildan faoliyat yuritadi. Maqolalar ikki tomonlama ko'r-ko'r taqriz (double-blind peer review) usuli bilan baholanadi.",
-      journal: "Jurnal",
+      desc: "Tamaddun — 2026-yildan faoliyat yurituvchi Respublika ilmiy-amaliy konferensiyasi. Materiallar to‘plami oyiga ikki marta elektron shaklda, ochiq kirishda chop etiladi.",
+      journal: "Konferensiya",
       editorialBoard: "Muharrirlar Kengashi",
       ethics: "Etika Qoidalari",
       reviewProcess: "Taqriz Jarayoni",
@@ -111,7 +111,7 @@ export const dictionaries = {
       badge: "Открытый доступ · CC BY 4.0",
       title1: "Наука без границ, ",
       title2: "знания свободны.",
-      desc: "Tamaddun — это многопрофильный научный журнал в открытом доступе. Мы предоставляем возможность качественной научной публикации.",
+      desc: "Tamaddun — республиканская научно-практическая конференция. Электронный сборник материалов публикуется дважды в месяц в открытом доступе.",
       btnPrimary: "Отправить статью ↗",
       btnOutline: "Смотреть архив"
     },
@@ -151,8 +151,8 @@ export const dictionaries = {
       inProgress: "(в процессе)"
     },
     footer: {
-      desc: "Tamaddun — это многопрофильный научный журнал, работающий с 2026 года. Статьи проходят двойное слепое рецензирование.",
-      journal: "Журнал",
+      desc: "Tamaddun — республиканская научно-практическая конференция, действующая с 2026 года. Электронный сборник материалов публикуется дважды в месяц в открытом доступе.",
+      journal: "Конференция",
       editorialBoard: "Редакционная коллегия",
       ethics: "Этика публикаций",
       reviewProcess: "Процесс рецензирования",
@@ -204,7 +204,7 @@ export const dictionaries = {
       badge: "Open Access · CC BY 4.0",
       title1: "Science without borders, ",
       title2: "knowledge is free.",
-      desc: "Tamaddun is a multidisciplinary open access scientific journal. We provide an opportunity for productive and high-quality scientific publication.",
+      desc: "Tamaddun is a national scientific and practical conference. Its proceedings are published electronically twice a month with open access.",
       btnPrimary: "Submit Article ↗",
       btnOutline: "View Archive"
     },
@@ -244,8 +244,8 @@ export const dictionaries = {
       inProgress: "(in progress)"
     },
     footer: {
-      desc: "Tamaddun is a multidisciplinary open access scientific journal operating since 2026. Articles are evaluated via double-blind peer review.",
-      journal: "Journal",
+      desc: "Tamaddun is a national scientific and practical conference operating since 2026. Its proceedings are published electronically twice a month with open access.",
+      journal: "Conference",
       editorialBoard: "Editorial Board",
       ethics: "Ethics Guidelines",
       reviewProcess: "Review Process",

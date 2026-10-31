@@ -37,7 +37,7 @@ export default function ArchiveBrowser({ selected }: { selected?: { year: number
     <AdmissionBanner />
     <div className="journal-page">
       <div className="breadcrumbs"><Link href="/">Bosh sahifa</Link><span>/</span>{selected ? <><Link href="/archive">Arxivlar</Link><span>/</span><span>{selected.volume}-jild, {selected.issue}-son</span></> : <span>Arxivlar</span>}</div>
-      <div className="page-heading"><div><span className="section-kicker">TAMADDUN / OPEN ACCESS</span><h1>{selected ? `${selected.volume}-jild, ${selected.issue}-son (${selected.year})` : 'Jurnal arxivi'}</h1></div><p>{selected ? 'Ushbu sonda chop etilgan ilmiy maqolalar va tezislar.' : 'Har bir son — yangi izlanishlar to‘plami. Muqovani tanlab, shu songa tegishli maqolalar bilan tanishing.'}</p></div>
+      <div className="page-heading"><div><span className="section-kicker">TAMADDUN / OPEN ACCESS</span><h1>{selected ? `${selected.volume}-jild, ${selected.issue}-son (${selected.year})` : 'Konferensiya arxivi'}</h1></div><p>{selected ? 'Ushbu sonda chop etilgan ilmiy maqolalar va tezislar.' : 'Har bir son — yangi izlanishlar to‘plami. Muqovani tanlab, shu songa tegishli maqolalar bilan tanishing.'}</p></div>
       {!isLiveJournal && <p className="demo-notice">Namuna maqolalar va ushbu brauzerda saqlangan materiallar ko‘rsatilmoqda.</p>}
       {loading ? <p role="status" className="empty-state">Arxiv yuklanmoqda…</p> : error ? <p role="alert" className="error-notice">{error}</p> : selected ? (
         current ? <div className="issue-detail-layout">

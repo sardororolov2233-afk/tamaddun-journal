@@ -20,7 +20,7 @@ export default function Navbar() {
     <nav className="site-nav" aria-label={menuLabel}>
       <Link href="/" className="nav-brand" onClick={() => setMenuPath(null)}>
         <div className="nav-logo" aria-hidden="true"><JournalMark /></div>
-        <div><div className="nav-name">Tamaddun<span>®</span></div><div className="nav-abbr">ILMIY JURNAL · SCIENTIFIC JOURNAL</div></div>
+        <div><div className="nav-name">Tamaddun<span>®</span></div><div className="nav-abbr">ILMIY-AMALIY KONFERENSIYA</div></div>
       </Link>
       <button className="menu-toggle" aria-expanded={open} aria-controls="primary-navigation" onClick={() => setMenuPath(open ? null : pathname)}>{open ? '×' : '☰'} <span>{menuLabel}</span></button>
       <div id="primary-navigation" className={`nav-links ${open ? 'is-open' : ''}`} onKeyDown={e => { if (e.key === 'Escape') setMenuPath(null); }}>

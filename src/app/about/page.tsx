@@ -9,15 +9,15 @@ export default function AboutPage() {
 
   const content = {
     UZ: {
-      title: "Jurnal Haqida",
+      title: "Konferensiya Haqida",
       subtitle: "Tamaddun",
-      description: "Tamaddun — fanlararo tadqiqotlarni qo'llab-quvvatlovchi, xalqaro va ochiq kirishli (Open Access) ilmiy nashrdir. Biz ilm-fan va innovatsiyalarni keng jamoatchilikka yetkazishda ko'prik vazifasini bajaramiz.",
+      description: "Tamaddun — Respublika ilmiy-amaliy konferensiyasi. Materiallar to‘plami oyiga ikki marta elektron shaklda, ochiq kirishda chop etiladi.",
       
       missionTitle: "Bizning Missiyamiz",
       missionDesc: "Ilmiy tadqiqotlar natijalarini to'siqlarsiz, ochiq va sifatli taqrizdan o'tkazilgan holda dunyo miqyosida tarqatish. Biz turli ilmiy yo'nalishlar o'rtasida muloqot va hamkorlikni rivojlantirishga intilamiz.",
       
-      scopeTitle: "Jurnal Qamrovi",
-      scopeDesc: "Jurnal quyidagi asosiy va fanlararo sohalardagi ilmiy maqolalarni qabul qiladi:",
+      scopeTitle: "Konferensiya Qamrovi",
+      scopeDesc: "Konferensiya quyidagi asosiy va fanlararo sohalardagi ilmiy maqolalarni qabul qiladi:",
       scopes: [
         "Tabiiy va aniq fanlar (Fizika, Kimyo, Matematika, Biologiya)",
         "Tibbiyot, sog'liqni saqlash va farmatsevtika",
@@ -27,30 +27,30 @@ export default function AboutPage() {
       ],
 
       policyTitle: "Nashr Siyosati",
-      policyDesc: "Tamaddun jurnali barcha maqolalarni Creative Commons Attribution (CC BY 4.0) litsenziyasi ostida chop etadi. Bu mualliflarga o'z ishlariga egalik huquqini saqlab qolish imkonini beradi va o'quvchilarga maqolalarni bepul o'qish, yuklab olish hamda iqtibos keltirish imkonini beradi.",
+      policyDesc: "Tamaddun konferensiyasi barcha maqolalarni Creative Commons Attribution (CC BY 4.0) litsenziyasi ostida chop etadi. Bu mualliflarga o'z ishlariga egalik huquqini saqlab qolish imkonini beradi va o'quvchilarga maqolalarni bepul o'qish, yuklab olish hamda iqtibos keltirish imkonini beradi.",
       
       detailsTitle: "Qo'shimcha Ma'lumotlar",
       frequency: "Davriylik",
-      frequencyVal: "Har 2 oyda bir marta (Yiliga 6 ta son)",
+      frequencyVal: "Oyiga ikki marta, elektron shaklda, ochiq kirishda",
       peerReview: "Taqriz Jarayoni",
       peerReviewVal: "Ikki tomonlama yashirin (Double-blind peer review), dastlabki ko‘rib chiqish 24–48 soat ichida",
       plagiarism: "Plagiat Siyosati",
       plagiarismVal: "Barcha maqolalar Plagiarism detector va Turnitin dasturlarida tekshiriladi (ruxsat etilgan max. ulush 15%)",
       
       ctaTitle: "O'z tadqiqotingizni nashr qiling",
-      ctaDesc: "Jurnal 2026-yildan faoliyat yuritadi. Hozir 1-jild, 3-son uchun qabul davom etmoqda.",
+      ctaDesc: "Konferensiya 2026-yildan faoliyat yuritadi. Hozir 1-jild, 3-son uchun qabul davom etmoqda.",
       ctaBtn: "Maqola Yuklash"
     },
     RU: {
-      title: "О журнале",
+      title: "О конференции",
       subtitle: "Tamaddun",
-      description: "Tamaddun — это международный междисциплинарный научный журнал открытого доступа (Open Access). Мы служим платформой для продвижения передовых научных исследований и инноваций во всем мире.",
+      description: "Tamaddun — республиканская научно-практическая конференция. Сборник материалов публикуется дважды в месяц в электронном виде, в открытом доступе.",
       
       missionTitle: "Наша Миссия",
       missionDesc: "Беспрепятственное и открытое распространение результатов качественных рецензируемых научных исследований. Мы стремимся развивать диалог и сотрудничество между различными научными дисциплинами.",
       
-      scopeTitle: "Направления Журнала",
-      scopeDesc: "Журнал принимает научные статьи по следующим основным и междисциплинарным областям:",
+      scopeTitle: "Направления Конференции",
+      scopeDesc: "Конференция принимает научные статьи по следующим основным и междисциплинарным областям:",
       scopes: [
         "Естественные и точные науки (Физика, Химия, Математика, Биология)",
         "Медицина, здравоохранение и фармация",
@@ -60,11 +60,11 @@ export default function AboutPage() {
       ],
 
       policyTitle: "Публикационная Политика",
-      policyDesc: "Журнал Tamaddun публикует все статьи под лицензией Creative Commons Attribution (CC BY 4.0). Это позволяет авторам сохранять авторские права, а читателям — свободно читать, скачивать и цитировать статьи без ограничений.",
+      policyDesc: "Конференция Tamaddun публикует все статьи под лицензией Creative Commons Attribution (CC BY 4.0). Это позволяет авторам сохранять авторские права, а читателям — свободно читать, скачивать и цитировать статьи без ограничений.",
       
       detailsTitle: "Дополнительная Информация",
       frequency: "Периодичность",
-      frequencyVal: "Раз в 2 месяца (6 выпусков в год)",
+      frequencyVal: "Дважды в месяц, в электронном виде, в открытом доступе",
       peerReview: "Рецензирование",
       peerReviewVal: "Двойное слепое рецензирование (Double-blind peer review), первичное рассмотрение в течение 24–48 часов",
       plagiarism: "Плагиат",
@@ -75,15 +75,15 @@ export default function AboutPage() {
       ctaBtn: "Отправить статью"
     },
     ENG: {
-      title: "About the Journal",
+      title: "About the Conference",
       subtitle: "Tamaddun",
-      description: "Tamaddun is an international, peer-reviewed, open-access scientific journal. We serve as a gateway to disseminate leading-edge scientific research and innovations to a global audience.",
+      description: "Tamaddun is a national scientific and practical conference. Its proceedings are published electronically twice a month with open access.",
       
       missionTitle: "Our Mission",
       missionDesc: "To facilitate barrier-free, open, and high-quality dissemination of peer-reviewed research findings. We aim to foster dialogue, synergy, and collaboration across diverse scientific fields.",
       
-      scopeTitle: "Journal Scope",
-      scopeDesc: "The journal welcomes original research papers in the following core and interdisciplinary branches:",
+      scopeTitle: "Conference Scope",
+      scopeDesc: "The conference welcomes original research papers in the following core and interdisciplinary branches:",
       scopes: [
         "Natural and Exact Sciences (Physics, Chemistry, Mathematics, Biology)",
         "Medicine, Health Sciences, and Pharmacy",
@@ -97,7 +97,7 @@ export default function AboutPage() {
       
       detailsTitle: "Key Details",
       frequency: "Frequency",
-      frequencyVal: "Bimonthly (6 issues per year)",
+      frequencyVal: "Twice a month, electronically, with open access",
       peerReview: "Peer Review",
       peerReviewVal: "Double-blind peer review initial review within 24–48 hours",
       plagiarism: "Plagiarism Policy",

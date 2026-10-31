@@ -153,7 +153,7 @@ export default function UploadArticleForm({ onSuccess }: { onSuccess?: () => voi
         </h2>
         <p style={{ color: 'var(--muted)', fontSize: '14px', marginBottom: '2rem', lineHeight: '1.6' }}>
           Iltimos, maqola ma&apos;lumotlarini to&apos;liq kiriting. <strong>DOCX va PDF</strong> variantlarining ikkalasini ham yuklash majburiydir.
-          PDF variantning yuqori (header) va pastki (footer) qismida jurnal nomi hamda hoshiyasi bo&apos;lishi shart.
+          PDF variantning yuqori (header) va pastki (footer) qismida konferensiya nomi hamda hoshiyasi bo&apos;lishi shart.
         </p>
 
         {errorMsg && (

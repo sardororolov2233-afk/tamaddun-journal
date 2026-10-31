@@ -120,7 +120,7 @@ export default function ArticleDetailPage() {
             <div style={{ fontFamily: '"Playfair Display", serif', fontSize: '1.4rem', fontWeight: 700 }}>Tamaddun</div>
             <img
               src="/jild_cover.png"
-              alt="Jurnal Muqovasi"
+              alt="Konferensiya Muqovasi"
               style={{ width: '150px', height: '210px', objectFit: 'cover', borderRadius: '4px', boxShadow: '0 4px 12px rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)' }}
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
@@ -141,14 +141,6 @@ export default function ArticleDetailPage() {
             >
               <i className="ti ti-file-type-pdf" style={{ fontSize: '1.2rem' }}></i> PDF (Yuklash)
             </a> : <p>Bu materialning PDF fayli hali mavjud emas.</p>}
-
-            {article.kind !== 'thesis' && <Link
-              href={`/article/${article.id}/certificate`}
-              target="_blank"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#e3f2fd', color: '#1976d2', textDecoration: 'none', padding: '10px', borderRadius: '30px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', width: '100%', marginBottom: article.has_certificate ? '10px' : '0' }}
-            >
-              <i className="ti ti-certificate"></i> Sertifikatni ko‘rish
-            </Link>}
 
             {article.has_certificate && (
               <a

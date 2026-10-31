@@ -69,7 +69,7 @@ export default function Home() {
   return (
     <>
       <AdmissionBanner />
-      <h2 className="sr-only">Tamaddun — jurnal bosh sahifasi</h2>
+      <h2 className="sr-only">Tamaddun — konferensiya bosh sahifasi</h2>
 
       <div className="hero">
         <div className="hero-eyebrow">{copy.label}<span>EST. 2026 / TAMADDUN</span></div>
@@ -84,7 +84,7 @@ export default function Home() {
         </div>
         <Link href="/archive" className="journal-art" aria-label={t.hero.btnOutline}>
           <div className="orbit orbit-one" /><div className="orbit orbit-two" />
-          <div className="journal-cover"><span className="cover-top">ILMIY JURNAL / SCIENTIFIC JOURNAL</span><strong>Tamaddun<span>∗</span></strong><div className="cover-symbol" aria-hidden="true"><JournalMark /></div><div className="cover-bottom"><span>ILM-FAN<br />CHEGARASIZ.</span><span>OPEN<br />ACCESS →</span></div></div>
+          <div className="journal-cover"><span className="cover-top">ILMIY KONFERENSIYA / SCIENTIFIC CONFERENCE</span><strong>Tamaddun<span>∗</span></strong><div className="cover-symbol" aria-hidden="true"><JournalMark /></div><div className="cover-bottom"><span>ILM-FAN<br />CHEGARASIZ.</span><span>OPEN<br />ACCESS →</span></div></div>
           <span className="art-caption">{copy.discover} →</span>
         </Link>
         <div className="hero-stats">
@@ -182,9 +182,6 @@ export default function Home() {
                     {getPdfUrl(article) !== '#' ? <a href={getPdfUrl(article)} target="_blank" rel="noopener noreferrer" className="btn-pdf" style={{ textDecoration: 'none' }}>
                       <i className="ti ti-file-type-pdf" aria-hidden="true" style={{ color: '#e53935' }}></i> PDF yuklash
                     </a> : <Link href={articlePath(article)} className="btn-pdf">{copy.details} →</Link>}
-                    {isSupabaseConfigured && article.kind !== 'thesis' && <Link href={`/article/${article.id}/certificate`} target="_blank" className="btn-cite" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <i className="ti ti-certificate" aria-hidden="true" style={{ color: 'var(--gold)' }}></i> Sertifikat
-                    </Link>}
                     <span className="doi">
                       {article.doi ? `DOI: ${article.doi}` : `${article.publication_year || 2026} · ${article.volume}-jild, ${article.issue}-son`}
                     </span>

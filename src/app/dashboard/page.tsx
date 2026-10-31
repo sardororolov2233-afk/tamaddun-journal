@@ -104,7 +104,7 @@ export default function DashboardPage() {
         setUsersList(JSON.parse(saved));
       } else {
         const defaultUsers = [
-          { id: '1', email: 'admin@tamaddun.uz', full_name: 'Jurnal Adminstratori', role: 'admin' },
+          { id: '1', email: 'admin@tamaddun.uz', full_name: 'Konferensiya Adminstratori', role: 'admin' },
           { id: '2', email: 'reviewer@tamaddun.uz', full_name: 'Dr. Karimov A.B.', role: 'reviewer' },
           { id: '3', email: 'author@tamaddun.uz', full_name: 'Ergashev Sherzod', role: 'author' }
         ];

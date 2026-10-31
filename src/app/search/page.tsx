@@ -256,9 +256,6 @@ function SearchContent() {
                     {isSupabaseConfigured && art.has_pdf ? <a href={getPdfUrl(art)} target="_blank" rel="noopener noreferrer" className="btn-pdf" style={{ textDecoration: 'none' }}>
                       <i className="ti ti-file-type-pdf" style={{ color: '#e53935' }}></i> PDF Yuklash
                     </a> : <Link href={articlePath(art)} className="btn-pdf">Maqolani o‘qish ↗</Link>}
-                    {isSupabaseConfigured && art.kind !== 'thesis' && <Link href={`/article/${art.id}/certificate`} target="_blank" className="btn-pdf" style={{ textDecoration: 'none', color: '#b8902a' }}>
-                      <i className="ti ti-certificate"></i> Sertifikat
-                    </Link>}
                   </div>
                   <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--muted)' }}>
                     {art.doi ? `DOI: ${art.doi}` : `${articleYear(art)} · ${art.volume}-jild, ${art.issue}-son`}

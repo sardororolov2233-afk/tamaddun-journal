@@ -8,7 +8,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Tamaddun",
-  description: "Tamaddun — ko'p tarmoqli, ochiq kirish ilmiy jurnali",
+  description: "Tamaddun — Respublika ilmiy-amaliy konferensiyasi. Materiallar to‘plami oyiga ikki marta elektron shaklda, ochiq kirishda chop etiladi.",
 };
 
 export default function RootLayout({
